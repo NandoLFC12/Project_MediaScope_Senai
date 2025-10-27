@@ -1,132 +1,178 @@
-* {
-    margin: 0;
-    padding: 0;
-}
-
-body{
-    margin: 0;
-    font-family: sans-serif;
-    background-color: gray;
-}
-
-.container_timeline{
-    color: white;
-    padding: 2em;
-}
-
-.container_timeline h1{
-    margin: 0.3em;
-    font-size: 3em;
-}
-
-.container_timeline h2{
-    margin-bottom: 0.5em;
-}
-
-.title_timeline{
-    text-align: center;
-}
-
-.title_timeline p{
-    color: purple;
-    font-size: 1.3em;
-    letter-spacing: 2px;
-}
-
-.timeline{
-    margin: 5em auto;
-    max-width: 34.15em;
-}
-
-.checkpoint{
-    max-width: 34em;
-    padding-top: 2em;
-    padding-bottom: 2em;
-    position: relative;
-}
-
-.checkpoint div{
-    border: 2px solid #888;
-    border-radius: 1em;
-    padding: 1.5em;
-}
-
-.checkpoint p{
-    line-height: 27px;
-    color: #ccc;
-}
-
-.checkpoint:nth-child(odd){
-    border-right: 3px solid #888;
-    padding-right: 3em;
-}
-
-.checkpoint:nth-child(even){
-    border-right: 3px solid #888;
-    padding-right: 3em;
-}
-
-.checkpoint:nth-child(odd)::before,
-.checkpoint:nth-child(even)::before{
-    content: '';
-    background:#888;
-    width: 3em;
-    height: 3px;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.checkpoint:nth-child(odd)::before{
-    right: 0;
-}
-
-.checkpoint:nth-child(even)::before{
-    right: 0;
-}
-
-.checkpoint:nth-child(odd) div::before,
-.checkpoint:nth-child(even) div::before{
-    content: '';
-    background-color: #fff;
-    box-shadow: 0 0 0.5em  purple;
-    width: 0.8em;
-    height: 0.8em;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    border-radius: 50%;
-}
-.checkpoint:nth-child(odd) div::before{
-    right: -0.5em;
-}
-
-.checkpoint:nth-child(even) div::before{
-    right: -0.5em;
-}
-
-@media screen and (max-width: 1150px) {
-    .timeline{
-        width: 80vw;
+    * {
+        margin: 0;
+        padding: 0;
     }
-    .timeline .checkpoint{
-        width: 100%;
-        transform: none;
-        padding-left: 0;
-        padding-right: 0;
-        border: none;
+
+    :root{
+        --text_color_dark_background:#ffff;
+        --text_color_light_background: #000;
+        --secondery_color_background: #150C28;
+        --color_timeline: rgba(159, 44, 191, 0.3);
+        --primary_ilumination_timeline: rgba(159, 44, 191, 0.6);
+        --secondery_ilumination_timeline:rgba(159, 44, 191, 0.9);
+        --primary_color: #6A3CA1;
+        --secondery_color: #A15ACD;
+        --terciary_color: #8A53C4;
     }
-    .timeline .checkpoint::before{
-        width: 3px;
-        height: 4em;
-        top: -2em;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .timeline .checkpoint div::before{
-        top: -0.5em;
-        left: 50%;
-        transform: translateX(-50%);
+
+    body{
+        margin: 0;
+        font-family: sans-serif;
     }
     
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* start of part header  */
+
+
+
+/* end of part header  */
+/* ///////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* begining of part .timeline */
+    .container_timeline{
+        color: var(--text_color_dark_background);
+        padding: 2em;
+        background-color: var(--secondery_color_background);
+    }
+
+    .container_timeline h1{
+        margin: 0.3em;
+        font-size: 3em;
+    }
+
+    .container_timeline h2{
+        margin-bottom: 0.5em;
+    }
+
+    .title_timeline{
+        text-align: center;
+        margin-bottom: 5%;
+    }
+
+    .title_timeline p{
+        color: var(--text_color_dark_background);
+        font-size: 1.3em;
+        letter-spacing: 2px;
+    }
+
+    .timeline{
+        justify-self: center;
+        max-width: 60em;
+        /* border: red 2px solid; */
+    }
+
+    .checkpoint{
+        padding-top: 2em;
+        padding-bottom: 2em;
+        position: relative;
+    }
+
+    .checkpoint div{
+        box-sizing: border-box;
+        box-shadow: none;
+        width: 95%;
+        background-color: var(--color_timeline);
+        border: 2px solid var(--color_timeline);
+        border-radius: 1em;
+        padding: 30px; 
+        transition: 0.3s ease; /* animação suave */
+        box-shadow: 0px 0px 0px var(--primary_ilumination_timeline); /* iluminação roxa */
 }
+
+    .checkpoint div:hover{
+        box-shadow: 0px 0px 30px var(--primary_ilumination_timeline); /* brilho mais forte ao passar o mouse */
+}   
+
+   
+
+    .checkpoint p{
+        line-height: 27px;
+        color: #ccc;
+    }
+
+    .checkpoint:nth-child(odd){
+        border-right: 3px solid var(--primary_ilumination_timeline);
+        padding-right: 3em;
+    }
+
+    .checkpoint:nth-child(even){
+        border-right: 3px solid var(--primary_ilumination_timeline);
+        padding-right: 3em;
+    }
+
+    .checkpoint:nth-child(odd)::before,
+    .checkpoint:nth-child(even)::before{
+        content: '';
+        background:var(--primary_ilumination_timeline);
+        box-shadow: 0 0 3px var(--primary_ilumination_timeline);
+        width: 6em;
+        height: 2px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+ 
+    .checkpoint:nth-child(odd)::before{
+        right: 0;
+    }
+
+    .checkpoint:nth-child(even)::before{
+        right: 0;
+    }
+
+    .checkpoint:nth-child(odd) div::before,
+    .checkpoint:nth-child(even) div::before{
+        content: '';
+        background-color: var(--text_color_dark_background);
+        box-shadow: 0 0 0.5em  var(--primary_ilumination_timeline);
+        width: 0.8em;
+        height: 0.8em;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
+    }    
+     .checkpoint div:hover::before{
+        background-color: rgba(159, 44, 191);
+        box-shadow: 0 1 1em var(--secondery_ilumination_timeline); /* brilho mais forte ao passar o mouse */
+
+    }
+    .checkpoint:nth-child(odd) div::before{
+        right: -0.5em;
+    }
+
+    .checkpoint:nth-child(even) div::before{
+        right: -0.5em;
+    }
+
+    @media screen and (max-width: 1150px) {
+        .title_timeline{
+            margin-bottom: 3em;
+        }
+        .timeline{
+            width: 80vw;
+        }
+        .timeline .checkpoint{
+            width: 100%;
+            transform: none;
+            padding-left: 0;
+            padding-right: 0;
+            border: none;
+        }
+        .timeline .checkpoint::before{
+            width: 3px;
+            height: 4em;
+            top: -2em;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .timeline .checkpoint div::before{
+            top: -0.5em;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+    }  
+/* end of part .timeline */
+/* ///////////////////////////////////////////////////////////////////////////////////////////////////////// */
+  

@@ -17,16 +17,216 @@
 
     body{
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         font-family: sans-serif;
     }
     
 /* //////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 /* start of part header  */
+/* Design da logo  */
 
+
+
+.logo{
+    text-decoration: none;
+}
+.logo h2{
+    color: var(--text_color_dark_background);
+    transition: .5s;
+    font-size: 32px;
+}
+.logo h2:hover{
+    color: var(--primary_color);
+}
+
+
+
+/* Fim do Design do logo */
+
+/* designer do texto das opções do menu */
+a#nav{
+    display: inline-block;
+    color: var(--text_color_dark_background);
+    text-decoration: none;
+    font-size: 18px;
+    font-style: bold;
+    
+    
+}
+ 
+a#nav:hover{
+    opacity: 1;
+    color: var(--secondery_ilumination_timeline);
+    box-shadow: 0 2px var(--secondery_ilumination_timeline);
+    
+}
+/* fim dos designers do texto das opções do menu  os A */
+
+
+header{
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100vmax;
+    background-color: var(--text_color_light_background);   
+    box-sizing: border-box;
+    z-index: 3;
+    /* box-shadow: 0px 0px 10px #ff0000; */
+}
+
+.Breno-Contact button{
+    padding: 10px 25px;
+    font-size: 18px;
+    font-weight: 600;
+    border: 1px solid var(--primary_color);
+    color: var(--text_color_dark_background);
+    background-color: var(--primary_color);
+    box-shadow: 0 0 12px var(--primary_ilumination_timeline);
+    border-radius: 10px;
+    cursor: pointer;
+    
+}
+.Breno-Contact button:hover{
+    box-shadow: 0 0 12px var(--secondery_ilumination_timeline);
+}
+
+
+nav{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 10vh;
+    
+
+}
+
+
+
+.nav-list{
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.nav-list li{
+    letter-spacing: 3px;
+    margin-left: 10Vh;
+    
+}
+
+.menu-sample{
+    display: none;
+    cursor: pointer;
+}
+.menu-sample div{
+    position: relative;
+    width: 32px;
+    height: 2px;
+    background-color: var(--text_color_dark_background);
+    margin: 8px;
+    transition: 0.3s;
+
+}
+
+.nav-list.active{
+    transform: translateX(0);
+}
+
+@keyframes navLinkFade {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.menu-sample.active .line1 {
+    transform: rotate(-45deg) translate(-8px, 8px);
+}
+.menu-sample.active .line2 {
+    opacity: 0;
+}
+.menu-sample.active .line3 {
+    transform: rotate(45deg) translate(-5px, -7px);
+}
+
+ @media (max-width: 1100px){
+    body{
+        overflow-x: hidden;
+    }
+    header{
+        width: 100%;
+        height: auto;
+    }
+    .nav-list {
+        position: fixed;
+        top: 8vh;
+        right: 0;
+        width: 30vw;
+        height: 92vh;
+        background-color: var(--text_color_light_background);
+        flex-direction: column;;
+        margin-top: 2vh;
+        padding-left: 20vh;
+        padding-bottom: 20vh;
+        justify-content: space-around;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in;
+        /* border: #ff0000 1px solid; */
+        
+    }
+    .nav-list li{
+        margin-left: 0;
+        opacity: 0;
+        /* border: 1px solid red; */
+        align-self: flex-start; 
+        text-align: left;  
+    }
+    .menu-sample{
+        display: block;
+    }
+ }
 
 
 /* end of part header  */
 /* ///////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* start of first section of introduction */
+ .first_section{
+    max-width: 100%;
+    height: 70vh;
+    border: red 2px solid ;
+ }
+
+ .section_container{
+    display: flex;
+ }
+
+ .first_space{
+    display: flex;
+    width: 30%;
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+    border: blue 2px solid;
+    
+ }
+ .second_space{
+    display: flex;
+    width: 70%;
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+    border: yellow 2px solid;
+    
+ }
+
+
+/* end of first section */
 /* //////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 /* begining of part .timeline */
     .container_timeline{

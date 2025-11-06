@@ -80,6 +80,11 @@ def build_youtube_services(credentials):
 # ... (imports e funções get_user_credentials, build_youtube_services
 #      permanecem os mesmos) ...
 
+# Em analytics/youtube_service.py
+
+# ... (imports e funções get_user_credentials, build_youtube_services
+#      permanecem os mesmos) ...
+
 def get_dashboard_data(user):
     
     if not user.profile.youtube_channel_id:
@@ -95,50 +100,81 @@ def get_dashboard_data(user):
     if not youtube or not youtube_analytics:
         return {'error': 'Falha ao iniciar os serviços da API do YouTube.'}
 
-    # Período de Análise (buffer de 2 dias)
-    end_date = datetime.now().date() - timedelta(days=2)
-    start_date = end_date - timedelta(days=27) 
-    start_date_str = start_date.strftime('%Y-%m-%d')
-    end_date_str = end_date.strftime('%Y-%m-%d')
+    # --- 1. DEFINIÇÃO DE DATAS (ATUAL E ANTERIOR) ---
+    
+    # Período Atual (últimos 28 dias, com buffer de 2 dias)
+    end_date_current = datetime.now().date() - timedelta(days=2)
+    start_date_current = end_date_current - timedelta(days=27) 
+    start_date_current_str = start_date_current.strftime('%Y-%m-%d')
+    end_date_current_str = end_date_current.strftime('%Y-%m-%d')
+    
+    # Período Anterior (os 28 dias antes do período atual)
+    end_date_previous = start_date_current - timedelta(days=1)
+    start_date_previous = end_date_previous - timedelta(days=27)
+    start_date_previous_str = start_date_previous.strftime('%Y-%m-%d')
+    end_date_previous_str = end_date_previous.strftime('%Y-%m-%d')
 
     data = {}
+    
+    # Métricas que queremos para os KPIs (imagem original)
+    kpi_metrics = "views,likes,comments,shares,subscribersGained,subscribersLost"
 
     try:
-        # 1. CHAMADA DE ANALYTICS (Gráfico Principal)
+        # --- 2. CHAMADAS DE API ---
+        
+        # CHAMADA A: Gráfico de Insights (Dados por dia, período ATUAL)
         analytics_request = youtube_analytics.reports().query(
             ids=f"channel=={channel_id}",
-            startDate=start_date_str,
-            endDate=end_date_str,
-            metrics="views,likes,averageViewDuration",
+            startDate=start_date_current_str,
+            endDate=end_date_current_str,
+            metrics="views,likes", # Gráfico só precisa desses dois
             dimensions="day",
             sort="day"
         )
         analytics_response = analytics_request.execute()
         data['analytics_timeseries'] = analytics_response
 
-        # --- [NOVA CHAMADA] ---
-        # 2. CHAMADA DE ANALYTICS (Gráfico de Região)
+        # CHAMADA B: KPIs (Totais, período ATUAL)
+        kpi_current_request = youtube_analytics.reports().query(
+            ids=f"channel=={channel_id}",
+            startDate=start_date_current_str,
+            endDate=end_date_current_str,
+            metrics=kpi_metrics # Pede views, likes, comments, shares, subs
+            # (Sem 'dimensions', a API retorna os totais)
+        )
+        kpi_current_response = kpi_current_request.execute()
+        data['kpi_current_period'] = kpi_current_response
+
+        # CHAMADA C: KPIs (Totais, período ANTERIOR)
+        kpi_previous_request = youtube_analytics.reports().query(
+            ids=f"channel=={channel_id}",
+            startDate=start_date_previous_str,
+            endDate=end_date_previous_str,
+            metrics=kpi_metrics # Pede as mesmas métricas, do período anterior
+        )
+        kpi_previous_response = kpi_previous_request.execute()
+        data['kpi_previous_period'] = kpi_previous_response
+
+        # CHAMADA D: Gráfico de Região (Período ATUAL)
         region_request = youtube_analytics.reports().query(
             ids=f"channel=={channel_id}",
-            startDate=start_date_str,
-            endDate=end_date_str,
-            metrics="views", # Queremos 'views'
-            dimensions="country", # Agrupadas por 'país'
-            sort="-views", # Os países com mais views primeiro
-            maxResults=5 # Pegamos o Top 5
+            startDate=start_date_current_str,
+            endDate=end_date_current_str,
+            metrics="views",
+            dimensions="country",
+            sort="-views",
+            maxResults=5
         )
         region_response = region_request.execute()
         data['region_data'] = region_response
-        # --- [FIM DA NOVA CHAMADA] ---
 
-        # 3. PEGA A PLAYLIST DE "UPLOADS" (Igual)
+        # CHAMADA E: Lista de Vídeos (Já estava correta)
         channel_request = youtube.channels().list(
             part="contentDetails", id=channel_id
         )
         channel_response = channel_request.execute()
         uploads_playlist_id = channel_response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
-        # 4. PEGA OS VÍDEOS DA PLAYLIST (Igual)
         videos_request = youtube.playlistItems().list(
             part="snippet", playlistId=uploads_playlist_id, maxResults=5
         )
@@ -146,7 +182,6 @@ def get_dashboard_data(user):
         video_items = videos_response.get('items', [])
         video_ids = [item['snippet']['resourceId']['videoId'] for item in video_items]
 
-        # 5. PEGA ESTATÍSTICAS PÚBLICAS DOS VÍDEOS (Igual)
         if video_ids:
             stats_request = youtube.videos().list(
                 part="snippet,statistics", id=",".join(video_ids)
@@ -155,35 +190,6 @@ def get_dashboard_data(user):
             data['video_list_stats'] = stats_response.get('items', [])
         else:
             data['video_list_stats'] = []
-
-        # --- [NOVO LOOP DE CHAMADAS] ---
-        # 6. PEGA IMPRESSÕES (DADO PRIVADO) PARA CADA VÍDEO
-        video_impressions = {}
-        for video_id in video_ids:
-            try:
-                # Uma chamada de API POR VÍDEO! (Isso é 'caro')
-                video_impressions_request = youtube_analytics.reports().query(
-                    ids=f"video=={video_id}",
-                    startDate=start_date_str, # Usando o mesmo período de 28 dias
-                    endDate=end_date_str,
-                    metrics="impressions",
-                )
-                video_impressions_response = video_impressions_request.execute()
-                
-                # A resposta é uma lista de linhas. Nós só queremos o total.
-                # A API retorna o total na lista 'totals' se não houver 'dimensions'
-                if video_impressions_response.get('rows'):
-                    video_impressions[video_id] = video_impressions_response['rows'][0][0]
-                else:
-                    # Se não houver 'rows', pode estar em 'totals' (API antiga)
-                    # ou simplesmente não ter dados.
-                    video_impressions[video_id] = 0
-            except HttpError as e:
-                logger.warning(f"Não foi possível buscar impressões para o vídeo {video_id}: {e}")
-                video_impressions[video_id] = 0 # Define como 0 se falhar
-        
-        data['video_impressions'] = video_impressions
-        # --- [FIM DO NOVO LOOP] ---
 
         return data
 

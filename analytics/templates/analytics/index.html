@@ -7,36 +7,50 @@
 <style>
     .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); gap: 25px;
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 25px;
     }
-    .kpi-card { grid-column: span 1; }
+    .kpi-card { grid-column: span 1; } 
+    .insights-card { 
+        grid-column: span 3; 
+        grid-row: span 2;
+    } 
+    .comparison-card { grid-column: span 1; } 
+    .table-card { grid-column: span 3; } 
+    .cta-card { grid-column: span 1; }
+    
     .kpi-card-value { font-size: 2.5rem; font-weight: 700; color: var(--text-color); margin-bottom: 10px; }
-    .kpi-card-trend { display: flex; gap: 10px; align-items: center; font-size: 0.9rem; color: var(--green); }
+    
+    /* [MUDANÇA] Lógica de cor para o percentual */
+    .kpi-card-trend { display: flex; gap: 10px; align-items: center; font-size: 0.9rem; }
+    .kpi-card-trend.positive { color: var(--green); }
+    .kpi-card-trend.negative { color: var(--red); }
     .kpi-card-trend .percent { background-color: rgba(0, 196, 159, 0.1); padding: 4px 8px; border-radius: 20px; }
-    .insights-card { grid-column: span 2; grid-row: span 2; }
+    .kpi-card-trend.negative .percent { background-color: rgba(255, 100, 100, 0.1); }
+    
     .insights-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .insights-legend { display: flex; gap: 20px; }
     .insights-legend span { display: flex; align-items: center; gap: 8px; }
     .insights-legend .dot1 { width: 10px; height: 10px; background-color: var(--primary); border-radius: 50%; }
     .insights-legend .dot2 { width: 10px; height: 10px; background-color: var(--secondary); border-radius: 50%; }
-    
-    /* [NOVO] Estilo para o gráfico Donut de Região */
     .region-chart-container {
         height: 120px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
-
-    .comparison-card { grid-column: span 1; }
+    
+    /* [MUDANÇA] CSS para o card de Comparação */
     .comp-item { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
     .comp-item:last-child { margin-bottom: 0; }
     .comp-icon { font-size: 2rem; color: var(--primary); background-color: var(--bg-color); padding: 12px; border-radius: 10px; }
     .comp-text { flex-grow: 1; }
     .comp-text span { font-size: 0.9rem; color: var(--text-muted); }
-    .comp-text h4 { font-size: 1.2rem; color: var(--text-color); }
-    .comp-chart { width: 60px; height: 60px; }
-    .table-card { grid-column: 1 / -1; }
+    .comp-text h4 { font-size: 1.2rem; color: var(--text-color); margin: 2px 0; }
+    .comp-trend { font-size: 0.9rem; font-weight: 600; }
+    .comp-trend.positive { color: var(--green); }
+    .comp-trend.negative { color: var(--red); }
+
     .video-table { width: 100%; border-collapse: collapse; }
     .video-table th, .video-table td { padding: 15px 10px; text-align: left; border-bottom: 1px solid var(--bg-color); }
     .video-table th { color: var(--text-muted); font-size: 0.9rem; }
@@ -65,23 +79,39 @@
         <div class="region-chart-container">
             <canvas id="regionChart"></canvas>
         </div>
-        {{ region_chart_data|json_script:"region-data" }}
     </div>
 
     <div class="card kpi-card">
         <div class="card-title">Likes (Últimos 28 dias)</div>
         <div class="kpi-card-value">{{ kpi_cards.likes|default:"0" }}</div>
-        <div class="kpi-card-trend">
-            <span>(Período de 28 dias)</span>
-        </div>
+        {% with change=kpi_cards.likes_change|default:0 %}
+            <div class="kpi-card-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                <span class="percent">{{ change }}%</span>
+                <span>vs. período anterior</span>
+            </div>
+        {% endwith %}
     </div>
 
     <div class="card kpi-card">
         <div class="card-title">Visualizações (Últimos 28 dias)</div>
         <div class="kpi-card-value">{{ kpi_cards.views|default:"0" }}</div>
-        <div class="kpi-card-trend">
-            <span>(Período de 28 dias)</span>
-        </div>
+        {% with change=kpi_cards.views_change|default:0 %}
+            <div class="kpi-card-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                <span class="percent">{{ change }}%</span>
+                <span>vs. período anterior</span>
+            </div>
+        {% endwith %}
+    </div>
+
+    <div class="card kpi-card">
+        <div class="card-title">Inscritos (Líquido, 28 dias)</div>
+        <div class="kpi-card-value">{{ kpi_cards.subscribers|default:"0" }}</div>
+        {% with change=kpi_cards.subscribers_change|default:0 %}
+            <div class="kpi-card-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                <span class="percent">{{ change }}%</span>
+                <span>vs. período anterior</span>
+            </div>
+        {% endwith %}
     </div>
 
     <div class="card insights-card">
@@ -95,24 +125,85 @@
         <div style="height: 350px;">
             <canvas id="insightsChart"></canvas>
         </div>
-        {{ insights_chart_data|json_script:"chart-data" }}
     </div>
 
-    <div class="card comparison-card">
-        <div class="card-title">Comparação (Em breve)</div>
+   <div class="card comparison-card">
+        <div class="card-title">Comparação (vs. período anterior)</div>
+        
+        <div class="comp-item">
+            <span class="material-symbols-outlined comp-icon">visibility</span>
+            <div class="comp-text">
+                <span>Visualizações</span>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <h4>{{ comparison_card.views|floatformat:"0" }}</h4>
+                    {% with change=comparison_card.views_change|default:0 %}
+                        <span class="comp-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                            {{ change }}%
+                        </span>
+                    {% endwith %}
+                </div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: -5px; display: block;">
+                    Anterior: {{ comparison_card.views_prev|floatformat:"0" }}
+                </span>
+            </div>
+        </div>
+        
         <div class="comp-item">
             <span class="material-symbols-outlined comp-icon">thumb_up</span>
-            <div class="comp-text"><span>Likes</span><h4>N/A</h4></div>
+            <div class="comp-text">
+                <span>Likes</span>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <h4>{{ comparison_card.likes|floatformat:"0" }}</h4>
+                    {% with change=comparison_card.likes_change|default:0 %}
+                        <span class="comp-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                            {{ change }}%
+                        </span>
+                    {% endwith %}
+                </div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: -5px; display: block;">
+                    Anterior: {{ comparison_card.likes_prev|floatformat:"0" }}
+                </span>
+            </div>
         </div>
+        
         <div class="comp-item">
             <span class="material-symbols-outlined comp-icon">comment</span>
-            <div class="comp-text"><span>Comentários</span><h4>N/A</h4></div>
+            <div class="comp-text">
+                <span>Comentários</span>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <h4>{{ comparison_card.comments|floatformat:"0" }}</h4>
+                    {% with change=comparison_card.comments_change|default:0 %}
+                        <span class="comp-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                            {{ change }}%
+                        </span>
+                    {% endwith %}
+                </div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: -5px; display: block;">
+                    Anterior: {{ comparison_card.comments_prev|floatformat:"0" }}
+                </span>
+            </div>
         </div>
+        
         <div class="comp-item">
             <span class="material-symbols-outlined comp-icon">share</span>
-            <div class="comp-text"><span>Compartilhados</span><h4>N/A</h4></div>
+            <div class="comp-text">
+                <span>Compartilhamentos</span>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <h4>{{ comparison_card.shares|floatformat:"0" }}</h4>
+                    {% with change=comparison_card.shares_change|default:0 %}
+                        <span class="comp-trend {% if change > 0 %}positive{% else %}negative{% endif %}">
+                            {{ change }}%
+                        </span>
+                    {% endwith %}
+                </div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: -5px; display: block;">
+                    Anterior: {{ comparison_card.shares_prev|floatformat:"0" }}
+                </span>
+            </div>
         </div>
     </div>
+
+
 
     <div class="card table-card">
         <div class="card-title">Engajamento por vídeo (5 mais recentes)</div>
@@ -122,7 +213,6 @@
                     <th>Vídeo</th>
                     <th>Status</th>
                     <th>Likes</th>
-                    <th>Impressões</th>
                     <th>Comentários</th>
                 </tr>
             </thead>
@@ -137,11 +227,11 @@
                     </td>
                     <td><span class="status-active">{{ video.status }}</span></td>
                     <td>{{ video.likes|floatformat:"0" }}</td>
-                    <td>{{ video.impressions|floatformat:"0" }}</td> <td>{{ video.comments|floatformat:"0" }}</td>
+                    <td>{{ video.comments|floatformat:"0" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;">Nenhum vídeo encontrado.</td>
+                    <td colspan="4" style="text-align: center; padding: 20px;">Nenhum vídeo encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -157,61 +247,63 @@
 </div>
 
 
-<script>
-    // --- Gráfico de Insights (Barras) ---
-    const chartDataElement = document.getElementById('chart-data');
-    if (chartDataElement) {
-        const chartData = JSON.parse(chartDataElement.textContent);
-        
-        new Chart( document.getElementById('insightsChart'), {
-            type: 'bar',
-            data: {
-                labels: chartData.labels,
-                datasets: chartData.datasets.map(dataset => ({
-                    ...dataset,
-                    borderRadius: 6
-                }))
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { grid: { color: '#444' }, ticks: { color: '#A0A0A0' } },
-                    x: {
-                        type: 'time',
-                        time: { unit: 'day', displayFormats: { day: 'MMM dd' } },
-                        grid: { display: false },
-                        ticks: { color: '#A0A0A0' }
-                    }
-                }
-            }
-        });
-    }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
-    // --- [NOVO] Gráfico de Região (Donut) ---
-    const regionDataElement = document.getElementById('region-data');
-    if (regionDataElement) {
-        const regionData = JSON.parse(regionDataElement.textContent);
-        
-        new Chart( document.getElementById('regionChart'), {
-            type: 'doughnut',
-            data: regionData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            color: '#A0A0A0',
-                            boxWidth: 10
-                        }
-                    }
+
+<script>
+// --- [A "PONTE NUCLEAR"] ---
+// 1. Injeta o JSON da view (ou 'null') direto em uma var JS
+//    O |safe é necessário para o Django renderizar o JSON como código, não como texto
+const chartData = {{ insights_chart_data|default:"null"|safe }};
+const regionData = {{ region_chart_data|default:"null"|safe }};
+
+// --- Gráfico de Insights (Barras) ---
+// 2. Checa se a VARIÁVEL (não o elemento) existe
+if (chartData && chartData.datasets) { 
+    new Chart( document.getElementById('insightsChart'), {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: chartData.datasets.map(dataset => ({
+                ...dataset,
+                borderRadius: 6
+            }))
+        },
+        options: { // (As opções são as mesmas de antes)
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: '#444' }, ticks: { color: '#A0A0A0' } },
+                x: {
+                    type: 'time',
+                    time: { unit: 'day', displayFormats: { day: 'MMM dd' } },
+                    grid: { display: false },
+                    ticks: { color: '#A0A0A0' }
                 }
             }
-        });
-    }
+        }
+    });
+}
+
+// --- Gráfico de Região (Donut) ---
+// 2. Checa se a VARIÁVEL (não o elemento) existe
+if (regionData && regionData.datasets) {
+    new Chart( document.getElementById('regionChart'), {
+        type: 'doughnut',
+        data: regionData,
+        options: { // (As opções são as mesmas de antes)
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
 </script>
 
 {% endblock %}

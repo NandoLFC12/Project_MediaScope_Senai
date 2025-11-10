@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabela de Preços</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f9f9fb;
+    color: #222;
+  }
+
+  .toggle-container {
+    display: inline-flex;
+    border: 2px solid #6a1b9a;
+    border-radius: 50px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  .toggle-btn {
+    padding: 10px 25px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    outline: none;
+    font-weight: bold;
+    color: #6a1b9a;
+    transition: 0.3s;
+  }
+
+  .toggle-btn.active {
+    background: #6a1b9a;
+    color: #fff;
+  }
+
+  .planos {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .plano {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 25px;
+    width: 250px;
+  }
+
+  .plano h3 {
+    margin-bottom: 10px;
+  }
+
+  .price {
+    font-size: 2em;
+    font-weight: bold;
+    color: #000;
+  }
+
+  .btn-comecar {
+    margin-top: 15px;
+    background: none;
+    border: 2px solid #6a1b9a;
+    color: #6a1b9a;
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .btn-comecar:hover {
+    background: #6a1b9a;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<h1>Simples preços, poderosos planos</h1>
+
+<div class="toggle-container">
+  <button id="btnMensal" class="toggle-btn active">Mensal</button>
+  <button id="btnAnual" class="toggle-btn">Anual</button>
+</div>
+
+<div class="planos">
+  <div class="plano">
+    <h3>Plano Essential</h3>
+    <p class="price" id="price1">R$297/mês</p>
+    <ul>
+      <li>Dashboard básico</li>
+      <li>Análise de sentimentos</li>
+      <li>Alertas por email</li>
+      <li>5.000 menções/mês</li>
+    </ul>
+    <button class="btn-comecar">Comece agora</button>
+  </div>
+
+  <div class="plano">
+    <h3>Professional plan</h3>
+    <p class="price" id="price2">R$597/mês</p>
+    <ul>
+      <li>20.000 menções/mês</li>
+      <li>Dashboards ilimitados</li>
+      <li>Suporte prioritário</li>
+      <li>Análise avançada</li>
+    </ul>
+    <button class="btn-comecar">Comece agora</button>
+  </div>
+
+  <div class="plano">
+    <h3>Enterprise plan</h3>
+    <p class="price" id="price3">R$1297/mês</p>
+    <ul>
+      <li>Menções ilimitadas</li>
+      <li>Suporte dedicado</li>
+      <li>Alertas inteligentes 24/7</li>
+    </ul>
+    <button class="btn-comecar">Comece agora</button>
+  </div>
+</div>
+
+<script>
+  const btnMensal = document.getElementById('btnMensal');
+  const btnAnual = document.getElementById('btnAnual');
+
+  const precos = {
+    mensal: ['R$297/mês', 'R$597/mês', 'R$1297/mês'],
+    anual: ['R$267/mês', 'R$537/mês', 'R$1197/mês'] // com desconto, por exemplo
+  };
+
+  btnMensal.addEventListener('click', () => {
+    alterarPrecos('mensal');
+    btnMensal.classList.add('active');
+    btnAnual.classList.remove('active');
+  });
+
+  btnAnual.addEventListener('click', () => {
+    alterarPrecos('anual');
+    btnAnual.classList.add('active');
+    btnMensal.classList.remove('active');
+  });
+
+  function alterarPrecos(tipo) {
+    document.getElementById('price1').textContent = precos[tipo][0];
+    document.getElementById('price2').textContent = precos[tipo][1];
+    document.getElementById('price3').textContent = precos[tipo][2];
+  }
+</script>
+
+</body>
+</html>

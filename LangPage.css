@@ -15,12 +15,15 @@
         --primary_color: #6A3CA1;
         --secondery_color: #A15ACD;
         --terciary_color: #8A53C4;
+        --light_background: #F3F3F3;
+        --background_learn_more: rgba(217, 217, 217,0.2);
     }
 
     body{
         width: 100%;
         min-height: 100vh;
         font-family: sans-serif;
+        background-color: var(--light_background);
     }
     
 /* //////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
@@ -112,6 +115,8 @@ header{
         
     }
 .Test_free button:hover{
+    background-color: var(--secondery_color);
+    border: 1px solid var(--secondery_color);
     box-shadow: 0 0 12px var(--secondery_ilumination_timeline);
 }
 
@@ -282,6 +287,8 @@ nav{
         
     }
 .Experiment_now button:hover{
+    background-color: var(--secondery_color);
+    border: 1px solid var(--secondery_color);
     box-shadow: 0 0 12px var(--secondery_ilumination_timeline);
 }
 
@@ -353,7 +360,6 @@ nav{
 
   .test_now button{
         padding: 10px 40px;
-        
         margin-top: 3%; 
         font-size: 20px;
         font-weight: 600;
@@ -365,6 +371,8 @@ nav{
         transition: 0.5s;
     }
     .test_now button:hover{
+        background-color: var(--secondery_color);
+        border: 1px solid var(--secondery_color);
         box-shadow: 0 0 12px var(--secondery_ilumination_timeline);
     }
 /* end first section the left side  */
@@ -376,8 +384,9 @@ nav{
 /* start of second section of introduction */
  .second_section{
     max-width: 100%;
-    height: 100vh;
+    height: 115vh;
     border: red 2px solid ;
+    background-color: var(--light_background);
  }
 
  .second_section_container{
@@ -406,8 +415,8 @@ nav{
 
  .three_space{
     display: flex;
-    width: 65%;
-    height: 70vh;
+    width: 55%;
+    height: 85vh;
     justify-content: center;
     align-items: center;
     border: blue 2px solid;
@@ -415,14 +424,204 @@ nav{
  }
  .four_space{
     display: flex;
-    width: 35%;
-    height: 70vh;
+    width: 45%;
+    height: 85vh;
     justify-content: center;
     align-items: center;
     border: yellow 2px solid;
     
  }
+
+ .box_information_second_section{
+    width: 80%;
+    height: 75vh;
+    padding: 40px 55px 0 55px;
+    background-color: var(--text_color_dark_background);
+    border-radius: 25px;
+    border: transparent 2px solid;
+ }
+ .box_information_second_section p{
+    margin: 10px 0;
+    padding: 0 20px 0 0 ;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--secondery_color);
+    border: transparent 2px solid;
+ }
+
+ .learn_more button{
+    font-size: 20px;
+    font-weight: 600;
+    padding: 7px 25px;
+    color: var(--text_color_light_background);
+    background-color: var(--background_learn_more);
+    border: rgba(0,0,0,0.5) solid 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.5s;
+ }  
+
+ .learn_more button:hover{
+    border: var(--terciary_color) 2px solid;
+    color: var(--text_color_dark_background);
+    background-color: var(--terciary_color);
+    box-shadow: 0 0 6px var(--secondery_ilumination_timeline);
+ }
+
+ 
+
 /* end of second section */
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* start of third section of introduction */
+ .third_section{
+    margin-top: 10vh;
+    max-width: 100%;
+    height: 85vh;
+    border: red 2px solid ;
+    background-color: var(--light_background);
+ }
+
+ .third_section_container{
+    display: flex;
+ }
+
+ .five_space{
+    display: flex;
+    width: 45%;
+    height: 85vh;
+    justify-content: center;
+    align-items: center;
+    border: blue 2px solid;
+    
+ }  
+ .box_information_third_section{
+    width: 80%;
+    height: 75vh;
+    padding: 40px 40px 0 40px;
+    background-color: var(--text_color_dark_background);
+    border-radius: 25px;
+    border: transparent 2px solid;
+ }
+ .box_information_third_section p{
+    margin: 10px 0;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--secondery_color);
+    border: transparent 2px solid;
+ }
+
+ .learn_more button{
+    font-size: 20px;
+    font-weight: 600;
+    padding: 7px 25px;
+    color: var(--text_color_light_background);
+    background-color: var(--background_learn_more);
+    border: rgba(0,0,0,0.5) solid 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.5s;
+ }  
+
+ .learn_more button:hover{
+    border: var(--terciary_color) 2px solid;
+    color: var(--text_color_dark_background);
+    background-color: var(--terciary_color);
+    box-shadow: 0 0 6px var(--secondery_ilumination_timeline);
+ }
+
+ .six_space{
+    display: flex;
+    width: 55%;
+    height: 85vh;
+    justify-content: center;
+    align-items: center;
+    border: yellow 2px solid;
+    
+ }
+
+/* end of third section */
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* start of fourth section of introduction */
+ .fourth_section{
+    margin-bottom: 5vh;
+    max-width: 100%;
+    height: 90vh;
+    /* border: red 2px solid ; */
+    background-color: var(--light_background);
+ }
+
+ .fourth_section_container{
+    display: flex;
+ }
+
+ .seven_space{
+    display: flex;
+    width: 55%;
+    height: 90vh;
+    justify-content: center;
+    align-items: center;
+    border: transparent 2px solid;
+    
+ }
+
+ .seven_space_img img{
+    width: 600px;
+    height: auto;
+    border: transparent 2px solid;
+ }
+
+ .eight_space{
+    display: flex;
+    width: 45%;
+    height: 85vh;
+    margin-top: 2.5vh;
+    justify-content: center;
+    align-items: center;
+    /* border: yellow 2px solid; */
+    
+ }
+
+ .box_information_fourth_section{
+    width: 80%;
+    height: 75vh;
+    padding: 0 0 0 40px ;
+    background-color: var(--text_color_dark_background);
+    border-radius: 25px;
+    border: transparent 2px solid;
+ }
+
+ .box_information_fourth_section h1{
+    padding: 40px 0 0 0;
+ }
+ .box_information_fourth_section p{
+    margin: 10px 0;
+    padding: 0 60px 0 0;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--secondery_color);
+    border: transparent 2px solid;
+ }
+
+ .learn_more button{
+    font-size: 20px;
+    font-weight: 600;
+    padding: 7px 25px;
+    color: var(--text_color_light_background);
+    background-color: var(--background_learn_more);
+    border: rgba(0,0,0,0.5) solid 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.5s;
+ }  
+
+ .learn_more button:hover{
+    border: var(--terciary_color) 2px solid;
+    color: var(--text_color_dark_background);
+    background-color: var(--terciary_color);
+    box-shadow: 0 0 6px var(--secondery_ilumination_timeline);
+ }
+
+/* end of fourth section */
 /* //////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 /* begining of part .timeline */
     .container_timeline{

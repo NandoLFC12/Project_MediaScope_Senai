@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Scope</title>
-    <link rel="stylesheet" href="LangPage.css">
+    <link rel="stylesheet" href="{% static 'landingpage/css/LangPage.css' %}">
 </head>
 <!-- //////////////////////////////////////////////////////////////////////// -->
 <!-- header part -->
@@ -52,7 +53,7 @@
     <section class="first_section">
         <div class="first_section_container">
             <div class="first_space">
-                <img src="Image_first_section.png" alt="">
+                <img src="{% static 'landingpage/images/Image_first_section.png' %}" alt="">
             </div>
             <div class="second_space">
                 <div class="first_section_text">
@@ -112,7 +113,7 @@
         <div class="fourth_section_container">
             <div class="seven_space">
                 <div class="seven_space_img">
-                <img src="image_fourth_section.1000px.png" alt="">
+                <img src="{% static 'landingpage/images/image_fourth_section.1000px.png' %}" alt="">
             </div></div>
             <div class="eight_space">
                 <div class="box_information_fourth_section">
@@ -189,45 +190,54 @@
     <div class="planos">
       <div class="plano">
         <div class="top_plans">
+            <div class="top_plans_img">
+            <img src="{% static 'landingpage/images/icons_planos (3).png' %}" alt="">
+        </div>
         <p>Plano Essential</p>
         <p class="price" id="price1">R$297<span>/mês</span></p>
         </div>
         <ul>
-          <li>Dashboard básico</li>
-          <li>Análise de sentimentos</li>
-          <li>Alertas por email</li>
-          <li>5.000 menções/mês</li>
-          <li>1 Usuário</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Dashboard básico</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Análise de sentimentos</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Alertas por email</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">5.000 menções/mês</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">1 Usuário</li>
         </ul>
         <button class="btn-begnning">Comece agora</button>
       </div>
 
       <div class="plano">
         <div class="top_plans">
+            <div class="top_plans_img">
+            <img src="{% static 'landingpage/images/icons_planos (1).png' %}" alt="">
+            </div>
         <p>Enterprise plan</p>
         <p class="price" id="price2">R$1297<span>/mês</span></p>
         </div>
         <ul>
-          <li>Menções ilimitadas</li>
-          <li>Análise preditivada com IA</li>
-          <li>Suporte dedicado</li>
-          <li>Segura enterprise</li>
-          <li>Alertas inteligentes 24/7</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Menções ilimitadas</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Análise preditivada com IA</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Suporte dedicado</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Segura enterprise</li>
+          <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Alertas inteligentes 24/7</li>
         </ul>
         <button class="btn-begnning">Comece agora</button>
       </div>
 
       <div class="plano">
         <div class="top_plans">
+            <div class="top_plans_img">
+            <img src="{% static 'landingpage/images/icons_planos (2).png' %}" alt="">
+        </div>
         <p>Professional plan</p>
         <p class="price" id="price3">R$597<span>/mês</span></p>
         </div>
         <ul>
-            <li>20.000 menções/mês</li>
-            <li>Dashboards ilimitados</li>
-            <li>Suporte prioritário</li>
-            <li>Análise de sentimentos avançada</li>
-            <li>Alertas multi-canais</li>
+            <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">20.000 menções/mês</li>
+            <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Dashboards ilimitados</li>
+            <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Suporte prioritário</li>
+            <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Análise de sentimentos avançada</li>
+            <li><img src="{% static 'landingpage/images/img_confere.png' %}" alt="">Alertas multi-canais</li>
         </ul>
         <button class="btn-begnning">Comece agora</button>
       </div>
@@ -236,6 +246,11 @@
 </section>
 <!-- end part of plans of upgrades -->
 <!-- /////////////////////////////////////////////////////////////////////////////////////////// -->
-<script src="LangPage.js"></script>
+<!-- start of last section -->
+
+
+<!-- end of last section -->
+<!-- /////////////////////////////////////////////////////////////////////////////////////////// -->
+<script src="{% static 'landingpage/js/LangPage.js' %}"></script>
 </body>
 </html>

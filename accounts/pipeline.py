@@ -1,5 +1,8 @@
 # Em accounts/pipeline.py
+
 import logging
+import requests
+from django.core.files.base import ContentFile
 from analytics.models import Profile
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -7,48 +10,60 @@ from googleapiclient.errors import HttpError
 
 logger = logging.getLogger(__name__)
 
-def save_youtube_channel_id(backend, user, response, *args, **kwargs):
+def save_youtube_channel_data(backend, user, response, *args, **kwargs):
     """
-    Esta função é chamada DEPOIS que o usuário se autentica com o Google.
-    Vamos usar o 'access_token' para buscar o ID do canal do usuário.
+    Busca os dados do CANAL do YouTube:
+    1. O ID do canal (para estatísticas).
+    2. A Foto do canal (para o perfil), se o usuário não tiver uma.
     """
-
-    # 1. GARANTE A CRIAÇÃO DO PERFIL (A CORREÇÃO!)
-    #    Esta linha executa PRIMEIRO. Ela cria o perfil se ele não existir.
+    
+    # Cria ou pega o perfil
     profile, created = Profile.objects.get_or_create(user=user)
 
-    # 2. Agora podemos checar com segurança se o ID está faltando.
-    if kwargs.get('is_new', False) or not profile.youtube_channel_id:
-        access_token = response.get('access_token')
+    # Precisamos do token para falar com o YouTube
+    access_token = response.get('access_token')
+    if not access_token:
+        return
 
-        if not access_token:
-            logger.warning(f"Não foi possível encontrar o access_token para o usuário {user.email}")
-            return
+    try:
+        # Conecta na API do YouTube
+        credentials = Credentials(token=access_token)
+        youtube_service = build('youtube', 'v3', credentials=credentials)
+        
+        # --- O PULO DO GATO ---
+        # Pedimos 'id' E 'snippet' (o snippet contém a foto e o título)
+        request = youtube_service.channels().list(
+            part="id,snippet", 
+            mine=True
+        )
+        api_response = request.execute()
 
-        try:
-            # 3. Constrói as credenciais e o serviço
-            credentials = Credentials(token=access_token)
-            youtube_service = build('youtube', 'v3', credentials=credentials)
-
-            # 4. Faz a chamada
-            request = youtube_service.channels().list(
-                part="id",
-                mine=True
-            )
-            api_response = request.execute()
-
-            # 5. Verifica e salva o ID
-            if api_response.get('items'):
-                channel_id = api_response['items'][0]['id']
-
-                # 6. Nós JÁ TEMOS o perfil, apenas atualizamos e salvamos.
+        if api_response.get('items'):
+            item = api_response['items'][0]
+            
+            # 1. SALVAR O ID DO CANAL (Vital para o Dashboard)
+            channel_id = item['id']
+            if profile.youtube_channel_id != channel_id:
                 profile.youtube_channel_id = channel_id
                 profile.save()
-                logger.info(f"ID do canal {channel_id} salvo para o usuário {user.email}")
-            else:
-                logger.warning(f"Usuário {user.email} logou, mas não possui um canal no YouTube.")
+                logger.info(f"ID do canal salvo: {channel_id}")
 
-        except HttpError as e:
-            logger.error(f"Erro na API do YouTube ao buscar ID do canal: {e}")
-        except Exception as e:
-            logger.error(f"Erro inesperado no pipeline 'save_youtube_channel_id': {e}")
+            # 2. SALVAR A FOTO DO CANAL (Se o usuário não tiver foto)
+            if not user.profile_picture:
+                # Pega a URL da foto de alta qualidade do canal
+                thumbnails = item['snippet']['thumbnails']
+                # Tenta pegar a maior possível: high > medium > default
+                picture_url = thumbnails.get('high', thumbnails.get('medium', thumbnails.get('default')))['url']
+                
+                if picture_url:
+                    image_response = requests.get(picture_url)
+                    if image_response.status_code == 200:
+                        user.profile_picture.save(
+                            f"youtube_avatar_{user.id}.jpg", 
+                            ContentFile(image_response.content), 
+                            save=True
+                        )
+                        logger.info(f"Foto do Canal YouTube salva para {user.email}")
+
+    except Exception as e:
+        logger.error(f"Erro ao buscar dados do YouTube: {e}")

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_countries',
     'social_django',
     'analytics',
     'accounts',
@@ -231,7 +232,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.social_auth.associate_by_email', # <-- Garante que está aqui
     'social_core.pipeline.user.create_user',
-    'accounts.pipeline.save_youtube_channel_id', 
+    'accounts.pipeline.save_youtube_channel_data',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
@@ -258,3 +259,9 @@ CACHES = {
         'LOCATION': 'youtube_data_cache', # Nome da tabela que será criada
     }
 }
+
+# Em config/settings.py (No final)
+
+# Configurações de Arquivos de Mídia (Uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

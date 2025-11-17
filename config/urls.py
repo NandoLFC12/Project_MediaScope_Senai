@@ -1,7 +1,8 @@
 # Em config/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
+from django.conf import settings # <--- Importante
+from django.conf.urls.static import static # <--- Importante
 from core import views as core_views
 
 urlpatterns = [
@@ -9,14 +10,13 @@ urlpatterns = [
     path('logout/', core_views.custom_logout_view, name='logout'),
     path('auth/', include('social_django.urls', namespace='social')),
     path('subscriptions/', include('subscriptions.urls')),
-
-    # [A ORDEM É IMPORTANTE]
-    # O 'analytics' (dashboard)
-    path('', include('analytics.urls')), # Tem '/dashboard/'
-
-    # O 'accounts' (login) AGORA CONTROLA A "PORTA DA FRENTE"
-    path('', include('accounts.urls')), # Tem '/' (com name='home')
-
-    # O 'core' (planos, etc)
-    path('', include('core.urls')), # Tem '/planos/'
+    
+    path('', include('analytics.urls')),
+    path('', include('accounts.urls')),
+    path('', include('core.urls')),
 ]
+
+# --- ADICIONE ISTO NO FINAL ---
+# Serve arquivos de mídia durante o desenvolvimento
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

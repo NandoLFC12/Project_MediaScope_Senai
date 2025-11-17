@@ -1,0 +1,455 @@
+{% extends "analytics/base.html" %}
+{% block title %}Configurações - Media Scope{% endblock %}
+
+{% block content %}
+
+<style>
+    /* --- CSS Dark Mode Global --- */
+    .settings-container { max-width: 900px; margin: 0 auto; padding-bottom: 80px; }
+    
+    /* Header */
+    .settings-header { margin-bottom: 30px; }
+    .settings-header h1 { color: #fff; font-size: 1.8rem; font-weight: 700; }
+    .settings-header p { color: #a0a0a0; }
+
+    /* Abas */
+    .settings-tabs { display: flex; border-bottom: 1px solid #3f3f46; margin-bottom: 30px; overflow-x: auto; }
+    .tab-btn {
+        background: none; border: none; padding: 15px 20px; color: #a0a0a0;
+        font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s; white-space: nowrap;
+    }
+    .tab-btn.active { color: #9D4EDD; border-bottom-color: #9D4EDD; }
+    .tab-btn:hover { color: #fff; }
+
+    /* Conteúdo das Abas */
+    .tab-content { display: none; animation: fadeIn 0.3s; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards Transparentes (Container) */
+    .card-transparent { /* Sem fundo, sem borda */ }
+
+    /* Inputs Escuros (A Nata) */
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: #d4d4d8; font-size: 0.9rem; }
+    .form-control {
+        width: 100%; padding: 12px 15px;
+        background-color: #18181b; border: 1px solid #3f3f46; border-radius: 8px;
+        color: #f4f4f5; font-size: 1rem; transition: 0.2s;
+    }
+    .form-control:focus { border-color: #9D4EDD; outline: none; box-shadow: 0 0 0 3px rgba(232, 69, 160, 0.15); }
+    
+    /* Foto */
+    .profile-section { display: grid; grid-template-columns: 250px 1fr; gap: 40px; }
+    .photo-column { text-align: center; }
+    .profile-pic-preview {
+        width: 160px; height: 160px; border-radius: 50%; object-fit: cover;
+        border: 4px solid rgba(255,255,255,0.1); margin-bottom: 20px;
+    }
+    .btn-upload {
+        background-color: rgba(255,255,255,0.05); color: #fff; border: 1px solid #3f3f46;
+        padding: 8px 20px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+    }
+    .btn-upload:hover { background-color: rgba(255,255,255,0.1); }
+    .upload-wrapper { position: relative; overflow: hidden; display: inline-block; }
+    .upload-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+    /* Botões de Ação */
+    .form-actions { margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end; }
+    .btn-save { background-color: #9D4EDD; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-save:hover { background-color: #9D4EDD; transform: translateY(-2px); }
+    .btn-danger { background-color: #ef4444; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none;}
+    .btn-danger:hover { background-color: #dc2626; }
+
+    /* Toggle Switch (Notificações) */
+    .toggle-wrapper { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #18181b; border: 1px solid #3f3f46; border-radius: 8px; margin-bottom: 15px; }
+    .toggle-info h4 { color: #fff; margin-bottom: 5px; font-size: 1rem; }
+    .toggle-info p { color: #a0a0a0; font-size: 0.85rem; margin: 0; }
+    
+    /* O Switch em si */
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3f3f46; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #9D4EDD; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    /* Responsivo */
+    @media (max-width: 768px) { .profile-section { grid-template-columns: 1fr; } }
+
+    /* --- ADICIONE ISSO NO SEU CSS DO SETTINGS.HTML --- */
+
+/* Estilo para os Cards de Conexão (Google) */
+.connection-box {
+    background-color: #18181b;
+    border: 1px solid #3f3f46;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+}
+.connection-box:hover {
+    border-color: #52525b;
+}
+.connection-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* A CORREÇÃO DA SENHA PEQUENA */
+/* Força o estilo em todos os inputs de senha, sem precisar de classes Python */
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #18181b !important;
+    border: 1px solid #3f3f46 !important;
+    border-radius: 8px;
+    color: #f4f4f5 !important;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-sizing: border-box; /* Garante que o padding não estoure a largura */
+}
+
+input[type="password"]:focus {
+    border-color: #9D4EDD !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(232, 69, 160, 0.15);
+}
+
+/* Texto de ajuda do Django (aquelas frases "A senha deve ter 8 caracteres...") */
+.helptext {
+    display: block;
+    font-size: 0.8rem;
+    color: #71717a;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+ul.errorlist {
+    color: #ef4444;
+    list-style: none;
+    padding: 0;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+/* Botão pequeno de desconectar */
+.btn-disconnect {
+    background-color: transparent;
+    color: #ef4444; /* Vermelho */
+    border: 1px solid #ef4444;
+    padding: 6px 15px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-disconnect:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Container do status conectado */
+.connected-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+</style>
+
+<div class="settings-container">
+    
+    <div class="settings-header">
+        <h1>Configurações da Conta</h1>
+        <p>Gerencie seus dados, segurança e preferências.</p>
+    </div>
+
+    <div class="settings-tabs">
+        <button class="tab-btn" onclick="openTab(event, 'profile')" id="btn-profile">Perfil</button>
+        <button class="tab-btn" onclick="openTab(event, 'plan')" id="btn-plan">Assinatura</button>
+        <button class="tab-btn" onclick="openTab(event, 'notifications')" id="btn-notifications">Notificações</button>
+        <button class="tab-btn" onclick="openTab(event, 'security')" id="btn-security">Segurança</button>
+    </div>
+
+    <div id="profile" class="tab-content">
+        <div class="card-transparent">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+                
+                <div class="profile-section">
+                    <div class="photo-column">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" id="preview" class="profile-pic-preview">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=random&size=160" id="preview" class="profile-pic-preview">
+                        {% endif %}
+                        <div class="upload-wrapper">
+                            <button class="btn-upload" type="button">Alterar Foto</button>
+                            <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(this)">
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label>Nome</label>
+                                {{ profile_form.first_name }}
+                            </div>
+                            <div class="form-group">
+                                <label>Sobrenome</label>
+                                {{ profile_form.last_name }}
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Email</label>
+                                {{ profile_form.email }}
+                            </div>
+                            <div class="form-group">
+                                <label>País</label>
+                                {{ profile_form.country }}
+                            </div>
+                            <div class="form-group">
+                                <label>Fuso Horário</label>
+                                {{ profile_form.timezone }}
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">Salvar Perfil</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="plan" class="tab-content">
+        <div class="card-transparent">
+            <h3 style="color: #fff; margin-bottom: 10px;">Seu Plano</h3>
+            <div style="background: #18181b; padding: 20px; border-radius: 8px; border: 1px solid #3f3f46; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h4 style="color: #fff; margin: 0;">Plano Gratuito</h4>
+                    <p style="color: #a0a0a0; margin: 5px 0 0;">Você tem acesso limitado aos recursos.</p>
+                </div>
+                <span style="background: #3f3f46; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem;">Ativo</span>
+            </div>
+            <br>
+            <a href="{% url 'planos' %}" class="btn-save" style="text-decoration: none; display: inline-block;">Fazer Upgrade</a>
+        </div>
+    </div>
+
+    <div id="notifications" class="tab-content">
+        <div class="card-transparent">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_notifications">
+
+                <div class="toggle-wrapper">
+                    <div class="toggle-info">
+                        <h4>Resumo Semanal</h4>
+                        <p>Receba um resumo das suas estatísticas toda segunda-feira.</p>
+                    </div>
+                    <label class="switch">
+                        {{ notification_form.email_digest }}
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-wrapper">
+                    <div class="toggle-info">
+                        <h4>Alertas de Segurança</h4>
+                        <p>Seja notificado sobre logins suspeitos na sua conta.</p>
+                    </div>
+                    <label class="switch">
+                        {{ notification_form.security_alerts }}
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-wrapper">
+                    <div class="toggle-info">
+                        <h4>E-mails de Marketing</h4>
+                        <p>Novidades, ofertas e atualizações do Media Scope.</p>
+                    </div>
+                    <label class="switch">
+                        {{ notification_form.marketing_emails }}
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Salvar Preferências</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="security" class="tab-content">
+    <div class="card-transparent">
+        
+        <div style="margin-bottom: 40px;">
+            <h3 style="color: #fff; margin-bottom: 15px;">Contas Conectadas</h3>
+            
+            <div class="connection-box">
+                <div class="connection-info">
+                    <svg width="32" height="32" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 9 4.909c1.69 0 3.218.6 4.418 1.582L15.887 4A11.907 11.907 0 0 0 9 0C5.007 0 1.465 2.287.06 5.733l5.206 4.032Z"/>
+                        <path fill="#34A853" d="M16.04 18.013c-1.524 1.12-3.837 1.897-7.04 1.897-4.243 0-7.827-2.64-9.27-6.39l-5.236 4.047C2.67 21.193 5.577 24 9 24c4.615 0 8.51-3.186 9.868-7.484l-2.828-1.49Z"/>
+                        <path fill="#4A90E2" d="M19.834 10.04c.128.676.166 1.227.166 1.96 0 4.735-3.174 11.95-9.98 11.95-3.423 0-6.33-2.807-9.02-6.426l5.235-4.047c.76 2.24 2.866 3.86 5.356 3.86 1.88 0 3.276-.67 4.15-1.35l2.743 2.203c-1.91 1.74-4.32 2.64-6.89 2.64-5.52 0-10-4.48-10-10S6.48 2 12 2c2.64 0 5.05.98 6.9 2.83l-2.84 2.84c-1.02-1.01-2.34-1.67-4.06-1.67-3.56 0-6.45 2.89-6.45 6.45s2.89 6.45 6.45 6.45c2.76 0 5.23-1.52 6.18-3.92H12v-4.95h12.834Z"/>
+                        <path fill="#FBBC05" d="M4.63 14.267c-.25-.733-.39-1.53-.39-2.267 0-.77.15-1.6.42-2.37l-5.207-4.03C.21 7.288 0 8.474 0 9.766c0 1.587.407 3.086 1.128 4.423l4.03-1.052-.528-1.87Z"/>
+                    </svg>
+                    <div>
+                        <h4 style="color: #fff; margin: 0; font-size: 1rem;">Google</h4>
+                        <p style="color: #a0a0a0; margin: 3px 0 0; font-size: 0.9rem;">Login facilitado e integração.</p>
+                    </div>
+                </div>
+                
+                {% if google_connected %}
+    <div class="connected-status">
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 8px; height: 8px; background: #34A853; border-radius: 50%; box-shadow: 0 0 5px #34A853;"></span>
+            <span style="color: #34A853; font-weight: 600; font-size: 0.9rem;">Conectado</span>
+        </div>
+
+        <form method="POST" action="{% url 'disconnect_google' %}" onsubmit="return confirm('Tem certeza que deseja desconectar sua conta Google?');">
+            {% csrf_token %}
+            <button type="submit" class="btn-disconnect">Desconectar</button>
+        </form>
+    </div>
+{% else %}
+    <a href="{% url 'social:begin' 'google-oauth2' %}" style="text-decoration: none;">
+        <div style="display: flex; align-items: center; gap: 5px; background: #3f3f46; padding: 6px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s;">
+            <span style="color: #fff; font-size: 0.85rem; font-weight: 500;">Conectar</span>
+        </div>
+    </a>
+{% endif %}
+            </div>
+        </div>
+
+        <div style="margin-bottom: 40px;">
+            <h3 style="color: #fff; margin-bottom: 15px;">
+                {% if has_password %} Alterar Senha {% else %} Criar Senha {% endif %}
+            </h3>
+            
+            {% if not has_password %}
+                <div style="background: rgba(232, 69, 160, 0.1); border: 1px solid #9D4EDD; color: #ffffff; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+                    <strong>Atenção:</strong> Você fez login com Google e ainda não tem uma senha. 
+                    Crie uma senha abaixo para poder desconectar sua conta Google ou entrar usando seu e-mail.
+                </div>
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                
+                {% if has_password %}
+                <div class="form-group">
+                    <label>Senha Atual</label>
+                    {{ password_form.old_password }}
+                    {% if password_form.old_password.errors %}
+                        <div style="color: #ef4444; font-size: 0.85rem; margin-top: 5px;">
+                            {{ password_form.old_password.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        {{ password_form.new_password1 }}
+                        <span class="helptext">Mínimo de 8 caracteres.</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nova Senha</label>
+                        {{ password_form.new_password2 }}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">
+                        {% if has_password %} Atualizar Senha {% else %} Criar Senha {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div style="border-top: 1px solid #3f3f46; padding-top: 30px;">
+            <h3 style="color: #ef4444; margin-bottom: 10px;">Zona de Perigo</h3>
+            <p style="color: #a0a0a0; margin-bottom: 20px;">
+                Excluir sua conta é uma ação permanente e não pode ser desfeita. Todos os seus dados serão apagados.
+            </p>
+            <form method="POST" action="{% url 'delete_account' %}" onsubmit="return confirm('Tem certeza ABSOLUTA que deseja excluir sua conta? Isso não tem volta.');">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger">Excluir Minha Conta</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+    // 1. Alternar Abas (Visual)
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabName).style.display = 'block';
+        setTimeout(() => document.getElementById(tabName).classList.add('active'), 10);
+        
+        if (evt) {
+            evt.currentTarget.classList.add('active');
+        } else {
+            const btn = document.getElementById('btn-' + tabName);
+            if(btn) btn.classList.add('active');
+        }
+    }
+
+    // 2. Auto-select na aba correta vinda do Python
+    document.addEventListener('DOMContentLoaded', function() {
+        const activeTab = "{{ active_tab }}"; 
+        if(activeTab) openTab(null, activeTab);
+
+        // --- AUTO-PREENCHIMENTO INTELIGENTE ---
+        
+        const timezoneInput = document.querySelector('[name="timezone"]');
+        const countryInput = document.querySelector('[name="country"]');
+
+        // A. TIMEZONE (Do Navegador)
+        if (timezoneInput && (timezoneInput.value === '' || timezoneInput.value === 'UTC')) {
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            timezoneInput.value = userTimezone;
+        }
+
+        // B. PAÍS (Via API de IP)
+        // Só roda se o usuário ainda NÃO selecionou um país (o valor é vazio ou o traço padrão)
+        if (countryInput && !countryInput.value) {
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    // data.country_code retorna algo como "BR", "US", "PT"
+                    if (data.country_code) {
+                        countryInput.value = data.country_code;
+                        console.log("País detectado: " + data.country_code);
+                    }
+                })
+                .catch(error => console.log('Não foi possível detectar o país automaticamente.'));
+        }
+    });
+
+    // 3. Preview da Foto
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) { document.getElementById('preview').src = e.target.result; }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+{% endblock %}

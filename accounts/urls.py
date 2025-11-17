@@ -1,10 +1,12 @@
-# Em accounts/urls.py (O CÓDIGO CORRETO E LIMPO)
-
 from django.urls import path
-from . import views  # <-- Importa o arquivo 'views.py' INTEIRO
+from . import views
 
 urlpatterns = [
-    # Aponta para a CLASSE 'AuthView' (com 'A' e 'V' maiúsculo)
-    # e usa o '.as_view()'
+    # ... suas outras rotas ...
     path('login/', views.AuthView.as_view(), name='login'),
+    path('settings/', views.settings_view, name='settings'),
+    path('settings/delete/', views.delete_account_view, name='delete_account'),
+    
+    # NOVA ROTA:
+    path('settings/disconnect-google/', views.disconnect_google_view, name='disconnect_google'),
 ]

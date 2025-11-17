@@ -15,7 +15,7 @@
             --text-color: #F1F1F1;
             --text-muted: #A0A0A0;
             --primary: #9D4EDD; /* Roxo principal */
-            --secondary: #E845A0; /* Rosa/Pink */
+            --secondary: #9d4edd; /* Rosa/Pink */
             --green: #00C49F;
             --shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
@@ -52,20 +52,7 @@
             flex-direction: column;
             gap: 25px;
         }
-        .sidebar-nav a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 2rem; /* Tamanho dos ícones */
-            display: flex;
-            justify-content: center;
-            padding: 10px;
-            border-radius: 8px;
-            transition: all 0.2s ease-in-out;
-        }
-        .sidebar-nav a:hover, .sidebar-nav a.active {
-            color: var(--text-color);
-            background-color: var(--card-bg);
-        }
+
         .sidebar-footer {
             margin-top: auto; /* Joga para o fim */
         }
@@ -131,9 +118,77 @@
             margin-bottom: 15px;
         }
 
+        /* Força a cor correta e remove o azul feio */
+        .sidebar-nav a {
+            color: #A0A0A0 !important; /* Cinza (text-muted) */
+            text-decoration: none !important;
+            text-shadow: none !important; /* Remove o "glitch" */
+            filter: none !important;
+        }
+
+        /* Quando passa o mouse ou está ativo */
+        .sidebar-nav a:hover, 
+        .sidebar-nav a.active {
+            color: #F1F1F1 !important; /* Branco */
+            background-color: #353542 !important; /* Fundo do card */
+        }
+
+        /* Garante que o ícone dentro do link obedeça a cor */
+        .sidebar-nav a span {
+            color: inherit !important;
+        }
+        
+        /* Mantém o ícone de Admin rosa */
+        .sidebar-nav a[title="Admin Dashboard"] {
+            color: #9D4EDD !important;
+        }
+
+        /* --- Adicione isso no CSS do base.html --- */
+
+.sidebar-profile-img {
+    width: 40px;  /* Tamanho ideal para sua sidebar de 80px */
+    height: 40px;
+    border-radius: 50%; /* Deixa redonda */
+    object-fit: cover;  /* Garante que a foto não fique esticada */
+    border: 2px solid #3f3f46; /* Borda sutil para destacar */
+    transition: all 0.2s ease;
+}
+
+/* Efeito ao passar o mouse: Borda Rosa */
+.sidebar-nav a:hover .sidebar-profile-img {
+    border-color: #9D4EDD;
+    transform: scale(1.1);
+}
+
+/* --- Toasts de Notificação (A Nata) --- */
+.django-messages {
+    position: fixed; top: 20px; right: 20px; z-index: 9999;
+}
+.message-toast {
+    padding: 15px 25px; margin-bottom: 10px; border-radius: 8px;
+    color: #fff; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    animation: slideIn 0.5s forwards, fadeOut 0.5s 5s forwards;
+    min-width: 300px;
+}
+.message-toast.success { background-color: #00C49F; border-left: 5px solid #009175; }
+.message-toast.error { background-color: #E845A0; border-left: 5px solid #c22e82; }
+.message-toast.warning { background-color: #FBBC05; border-left: 5px solid #d49e04; }
+
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+
     </style>
 </head>
 <body>
+    {% if messages %}
+        <div class="django-messages">
+            {% for message in messages %}
+                <div class="message-toast {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <aside class="sidebar">
         <div class="sidebar-logo">
@@ -160,13 +215,20 @@
         <span class="material-symbols-outlined" style="color: var(--secondary);">admin_panel_settings</span>
     </a>
     {% endif %}
-    </nav>
 
             <a href="#" title="Histórico (Em breve)">
                 <span class="material-symbols-outlined">history</span>
             </a>
-            <a href="#" title="Conta (Em breve)">
-                <span class="material-symbols-outlined">group</span>
+            <a href="{% url 'settings' %}" title="Minha Conta" 
+                class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+    
+                {% if request.user.profile_picture %}
+                    <img src="{{ request.user.profile_picture.url }}" alt="Perfil" class="sidebar-profile-img">
+    
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:'User' }}+{{ request.user.last_name }}&background=random&color=fff&size=128" alt="Perfil" class="sidebar-profile-img">
+    
+            {% endif %}
             </a>
             <a href="#" title="YouTube (Em breve)">
                 <span class="material-symbols-outlined">smart_display</span>

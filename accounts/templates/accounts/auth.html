@@ -164,19 +164,53 @@
             color: #666;
         }
 
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
+    /* --- CSS DO MODAL DE LOGIN/CADASTRO --- */
+    
+    /* Garante que TODOS os inputs (texto, email, senha) sejam iguais */
+    .form-input, 
+    input[type="text"],
+    input[type="email"], 
+    input[type="password"] {
+        width: 100%;             /* Ocupa a largura total */
+        padding: 12px 15px;      /* Espaçamento interno confortável */
+        margin-bottom: 15px;     /* Espaço entre um campo e outro */
+        
+        background-color: #ffffff; /* Fundo Branco */
+        border: 1px solid #ced4da; /* Borda cinza suave */
+        border-radius: 8px;        /* Cantos arredondados */
+        color: #495057;            /* Cor do texto digitado */
+        
+        font-size: 1rem;
+        box-sizing: border-box;    /* Garante que o padding não estoure o tamanho */
+        transition: border-color 0.2s;
+    }
 
-        .form-input:focus {
-            outline: none;
-            border-color: #000;
-        }
+    /* Efeito ao clicar no campo */
+    .form-input:focus,
+    input[type="text"]:focus,
+    input[type="email"]:focus, 
+    input[type="password"]:focus {
+        border-color: #9D4EDD; /* Foco Rosa */
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(232, 69, 160, 0.1);
+    }
+
+    /* Botão de Ação (Sign in / Sign up) */
+    .auth-btn {
+        background-color: #000; /* Preto (ou use #E845A0 para rosa) */
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        width: 100%;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.2s;
+    }
+    .auth-btn:hover {
+        background-color: #333; /* Cinza escuro no hover */
+    }
 
         .submit-btn {
             width: 100%;
@@ -368,7 +402,7 @@
 
             <div class="divider">OR</div>
 
-            <form method="POST" action="{% url 'home' %}">
+            <form method="POST" action="{% url 'login' %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="signin">
                 
@@ -404,7 +438,7 @@
 
             <div class="divider">OR</div>
 
-            <form method="POST" action="{% url 'home' %}">
+            <form method="POST" action="{% url 'login' %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="signup">
                 

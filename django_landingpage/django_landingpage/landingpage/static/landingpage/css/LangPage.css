@@ -1,4 +1,4 @@
-    * {
+        * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
@@ -951,7 +951,74 @@ nav{
 
 /* end part of plans of upgrades */
 /* ///////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* start of review section  */
+.review_section{
+    max-width: 100%;
+    height: 100vh;
+    
+    background-color: var(--secondery_color_background);
+
+}
+
+.tittle_review_section{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    height: 20vh;
+    border: #F3F3F3 solid 2px;
+    color: var(--text_color_dark_background);
+}
+.tittle_review_section h2{
+    font-size: 32px;
+    font-weight: 800;
+    font-style: bold;
+}
+
+/* end of review section  */
+/* ///////////////////////////////////////////////////////////////////////////////////////////////////////// */
 /* start of last section */
+
+.fifth_section{
+    max-width:100%;
+    height: 90vh;
+    margin-top: 5vh;
+}
+.fifth_section_container{
+    display: flex;
+}
+
+.nine_space{
+    display: flex;
+    justify-content: center;  /* Centraliza a imagem horizontalmente */
+    align-items: center;
+    width: 40%;
+    height: 90vh;
+}
+
+.fifth_section_img img{
+    width: 620px;
+    height: auto;
+}
+
+.ten_space{
+    width: 60%;
+    height: 90vh;
+    padding: 0 0 0 5vh;
+}
+
+.title_ten_space{
+    font-size: 34px;
+    font-weight: 800;
+    font-style: bold;
+    color: var(--primary_color);
+}
+
+.paragrafan_ten_space{
+    font-size: 28px;
+    font-weight: 600;
+}
+
 
 
 /* end of last section */

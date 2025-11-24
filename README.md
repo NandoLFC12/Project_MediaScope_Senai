@@ -1,112 +1,208 @@
-# 🚀 Media Scope
+# MediaScope — Plataforma de Análise de Dados do YouTube
 
-**Media Scope** é uma plataforma SaaS de Analytics focada em criadores de conteúdo do YouTube. O sistema oferece dashboards interativos, gerenciamento de assinaturas, integração via OAuth2 com Google/YouTube e análise de sentimentos de comentários usando Processamento de Linguagem Natural (NLP).
-
----
-
-## 🛠️ Tecnologias Utilizadas
-
-* **Backend:** Python 3.11+, Django 5.x
-* **Banco de Dados:** PostgreSQL
-* **Autenticação:** Django Auth + Social Auth (Google OAuth2)
-* **Integrações:** YouTube Data API v3
-* **Data Science:** TextBlob (Análise de Sentimentos) (a ser implementado)
-* **Frontend:** HTML5, CSS3 (Dark Mode), JavaScript
+**Resumo**
+MediaScope é uma plataforma para coletar, processar e visualizar métricas de canais e vídeos do YouTube, construída em Python utilizando a biblioteca oficial do Google para acesso à YouTube Data API. Esta versão foi entregue como um repositório com scripts de coleta, serviços e uma interface/ou scripts para análise.
 
 ---
 
-## ⚙️ Pré-requisitos
-
-Antes de começar, certifique-se de ter instalado em sua máquina:
-* [Python 3.11+](https://www.python.org/downloads/)
-* [PostgreSQL](https://www.postgresql.org/download/) (e pgAdmin para gerenciar)
-* [Git](https://git-scm.com/)
+## Índice
+- [Resumo](#resumo)
+- [Funcionalidades](#funcionalidades)
+- [Stack e Dependências](#stack-e-dependências)
+- [Estrutura do Repositório](#estrutura-do-repositório)
+- [Instalação](#instalação)
+- [Configuração (API Keys e .env)](#configuração-api-keys-e-env)
+- [Como rodar](#como-rodar)
+- [Scripts úteis](#scripts-úteis)
+- [Como a YouTube Data API é utilizada](#como-a-youtube-data-api-é-utilizada)
+- [Banco de dados](#banco-de-dados)
+- [Testes](#testes)
+- [Melhorias futuras](#melhorias-futuras)
+- [Contribuição](#contribuição)
+- [Licença](#licença)
 
 ---
 
-## 🚀 Guia de Instalação e Execução
+## Funcionalidades
+- Coleta de estatísticas de vídeos e canais (views, likes, comentários, inscritos, metadata).
+- Agendamento de coleta periódica (cron / scheduler).
+- Exportação de dados para CSV/Excel.
+- Dashboards / visualizações (pode incluir scripts para gerar gráficos com Plotly/Matplotlib).
+- Relatórios automatizados (opcional).
 
-Siga os passos abaixo para rodar o projeto localmente.
+---
 
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/Fabinhonhou/MediaScope.git
-cd MediaScope
-git checkout dash
+## Stack e Dependências
+- Python 3.10+
+- google-api-python-client (YouTube Data API)
+- requests
+- pandas (provável)
+- Dependências listadas em `requirements.txt` (verificado no repositório).
+
+> Verifique `requirements.txt` para a lista completa de pacotes e versões.
+
+---
+
+## Estrutura sugerida do repositório (detectado)
+A análise inicial identificou os seguintes arquivos/estruturas (amostra):
+
+```
+/mnt/data/Project_MediaScope_Senai-dash
 ```
 
-### 2. Crie e Ative o ambiente virtual (venv)
-```bash
-(windows)
-python -m venv venv
-venv\Scripts\activate
+Arquivos detectados: 64 (amostra incluída no rascunho de documentação entregue).
 
-#caso esteja em um sistema operacional diferente, utilizar esses códigos abaixo
-#(mac/linux)
-#python3 -m venv venv
-#source venv/bin/activate
+Pastas e arquivos importantes:
+- `scripts/` — scripts de coleta e atualização (ex.: `collect_data.py`, `update_metrics.py`)
+- `app/` ou `src/` — código principal da aplicação (se existir)
+- `requirements.txt` — dependências Python
+- `README.md` original (presente no repositório)
+- `.env.example` ou similar (se existir) — variáveis de ambiente exemplo
+
+> Observação: se alguma das pastas acima não existir no seu repositório, adapte conforme a estrutura real.
+
+---
+
+## Instalação
+
+1. Clone o repositório:
+```bash
+git clone /mnt/data/Project_MediaScope_Senai-dash.zip media_scope
+cd media_scope
 ```
-### 3. Instale as Dependências
+
+2. Crie e ative um virtualenv (recomendado):
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Linux / macOS
+.venv\Scripts\activate    # Windows (PowerShell)
+```
+
+3. Instale dependências:
 ```bash
 pip install -r requirements.txt
 ```
-### 4. Configure as Variáveis do Ambiente (.env)
-na raiz do projeto, crie um arquivo chamado **.env** e cole os seguintes dados nele 
-```
-# Configurações do Django
-DEBUG=True
-SECRET_KEY=sua_chave_secreta_aqui
-
-# Banco de Dados (PostgreSQL)
-DB_NAME=MediaScope
-DB_USER=postgres
-DB_PASSWORD=sua_senha_postgres
-DB_HOST=localhost
-DB_PORT=5432
-
-# Google OAuth2 / YouTube API
-# (Obtenha no Google Cloud Console)
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=seu_client_id_do_google
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=seu_client_secret_do_google
-```
-(será enviado um arquivo .env com os dados já preenchidos para utilização e teste do projeto)
-
-### 5. Configurar o Banco de Dados
-
-Certifique-se de que o PostgreSQL está rodando e que você criou um banco de dados vazio com o nome definido no .env
-
-Em seguida, execute as migrações:
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-### 6. Criar um Superusuário 
-```bash
-python manage.py createsuperuser
-```
-### 7. Rodar o Servidor
-```bash
-python manage.py runserver
-
-# O projeto estará acessível em: http://127.0.0.1:8000/
-```
-(como é algo sobre análise de redes sociais com a utilização de um canal Youtube, é necessário que a conta utilizada tenha um canal no youtube. Caso a conta não possua um canal, irá aparecer a menssagem que a conta não possui dados para a análise. Nossos testes estão sendo feitos na conta de um amigo que será utilizada na apresentação final do trabalho.)
 
 ---
 
-### 🧪 Funcionalidades Principais
-1.Autenticação Híbrida: Login via E-mail/Senha ou Google (YouTube).
+## Configuração (API Keys e .env)
 
-2.Pipeline de Perfil: Recuperação automática da foto e ID do canal do YouTube após o login.
+Crie um arquivo `.env` na raiz do projeto (ou copie `.env.example`) com as variáveis mínimas:
 
-3.Dashboard: Visão geral de métricas e gráficos.
+```
+YOUTUBE_API_KEY=your_api_key_here
+DATABASE_URL=...
+# Outras variáveis possíveis:
+# DJANGO_SECRET_KEY (se aplicável)
+# FLASK_APP (se aplicável)
+# SMTP_* (se houver envio de e-mail)
+```
 
-4.Planos e Assinaturas: Sistema de upgrade de conta (Free/Pro).
+Como obter a API Key do YouTube:
+1. Acesse o console do Google Cloud (https://console.cloud.google.com/).
+2. Crie um novo projeto (ou use um existente).
+3. Habilite a API "YouTube Data API v3".
+4. Vá em "Credenciais" e crie uma API Key.
+5. Cole a chave em `YOUTUBE_API_KEY` no seu `.env`.
 
-5.Configurações de Usuário: Edição de perfil, troca de senha, dark mode e "Danger Zone" (Exclusão de conta).
+---
 
---- 
+## Como rodar
 
-### ⚠️ Observações Importantes
+### Executar scripts de coleta manualmente
+```bash
+python scripts/collect_data.py
+```
 
-O sistema de upload de fotos ignora arquivos locais no Git para manter o repositório leve.
+### Rodar a aplicação (se houver FastAPI/Flask)
+Exemplos possíveis — adapte conforme o framework usado:
+
+**FastAPI**
+```bash
+uvicorn app.main:app --reload
+```
+
+**Flask**
+```bash
+export FLASK_APP=app
+flask run
+```
+
+Se a aplicação não expuser uma API, confira os scripts em `scripts/` para entender como os dados são coletados e onde são salvos.
+
+---
+
+## Scripts úteis (exemplos)
+- `scripts/collect_data.py` — coleta dados da YouTube Data API e grava no banco.
+- `scripts/update_metrics.py` — atualiza métricas históricas.
+- `scripts/export_csv.py` — exporta dados em CSV/Excel.
+- `scripts/run_scheduler.py` — roda um agendador (APScheduler / cron wrapper).
+
+> Consulte os scripts reais no diretório `scripts/` para confirmações de nomes e parâmetros.
+
+---
+
+## Como a YouTube Data API é utilizada
+O repositório traz detecções de uso da biblioteca `googleapiclient` / chamadas à YouTube API. Exemplo de uso típico:
+
+```python
+from googleapiclient.discovery import build
+youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+
+request = youtube.videos().list(part="snippet,statistics,contentDetails", id=VIDEO_ID)
+response = request.execute()
+```
+
+A documentação do Google (YouTube Data API v3) é a referência para parâmetros e quotas. Lembre-se de tratar quotas e implementar retries/backoff para chamadas em lote.
+
+---
+
+## Banco de dados
+A análise inicial não detectou com certeza qual banco foi usado. Possíveis opções:
+- MongoDB (pymongo / mongoengine)
+- PostgreSQL / MySQL (psycopg2 / SQLAlchemy)
+
+Se informar qual foi utilizado, posso gerar o diagrama de esquema (collections/tables e campos) automaticamente.
+
+---
+
+## Testes
+- Testes unitários: `pytest` (se existirem testes).
+- Rodar testes:
+```bash
+pytest
+```
+
+---
+
+## Boas práticas e observações
+- Nunca versionar o `.env` com chaves reais.
+- Use variáveis de ambiente para credenciais.
+- Trate e registre erros de chamadas à API (logs).
+- Implemente paginação e controle de rate-limits.
+- Centralize chamadas à API em um módulo/service para facilitar testes e mocking.
+
+---
+
+## Melhorias futuras
+- Implementar análise de sentimento dos comentários (NLP).
+- Dashboard web completo (React/Vue/Plotly Dash).
+- Agendamento robusto (Celery/RabbitMQ ou APScheduler com supervisão).
+- Monitor de quota da API e alertas.
+- Históricos detalhados e projeções de crescimento.
+
+---
+
+## Contribuição
+Sinta-se à vontade para abrir issues e pull requests. Use o padrão de commits e inclua testes para novas funcionalidades.
+
+---
+
+## Licença
+Adicione aqui a licença do projeto (por exemplo, MIT). Se não houver, recomendo `MIT` para projetos open-source.
+
+---
+
+## Contato
+Para dúvidas sobre a documentação gerada, ou para que eu gere o README finalizado com exemplos extraídos automaticamente do código (endpoints, amostras de payloads, esquema do BD), responda com **"Gerar automático com extração de endpoints e modelos"**.
+

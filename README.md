@@ -63,8 +63,11 @@ Pastas e arquivos importantes:
 
 1. Clone o repositório:
 ```bash
-git clone /mnt/data/Project_MediaScope_Senai-dash.zip media_scope
-cd media_scope
+git clone https://github.com/Fabinhonhou/MediaScope.git
+cd MediaScope
+# caso esteja em outra branch, use o comando git checkout nome-da-branch
+# nesse caso, a branch está como dash
+git checkout dash
 ```
 
 2. Crie e ative um virtualenv (recomendado):

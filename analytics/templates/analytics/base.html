@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load static %} <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -42,11 +42,27 @@
             align-items: center;
             border-right: 1px solid #444;
         }
+        
+        /* --- 2. CSS DA LOGO ATUALIZADO --- */
         .sidebar-logo {
-            font-size: 2rem;
-            color: var(--primary);
             margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
+        
+        .logo-img {
+            width: 50px; /* Tamanho ideal para a sidebar de 80px */
+            height: auto; /* Mantém a proporção */
+            filter: drop-shadow(0 0 5px rgba(157, 78, 221, 0.3)); /* Um brilho sutil roxo */
+            transition: transform 0.2s;
+        }
+        
+        .logo-img:hover {
+            transform: scale(1.1); /* Efeito de zoom ao passar o mouse */
+        }
+
         .sidebar-nav {
             display: flex;
             flex-direction: column;
@@ -143,39 +159,37 @@
             color: #9D4EDD !important;
         }
 
-        /* --- Adicione isso no CSS do base.html --- */
+        .sidebar-profile-img {
+            width: 40px;  /* Tamanho ideal para sua sidebar de 80px */
+            height: 40px;
+            border-radius: 50%; /* Deixa redonda */
+            object-fit: cover;  /* Garante que a foto não fique esticada */
+            border: 2px solid #3f3f46; /* Borda sutil para destacar */
+            transition: all 0.2s ease;
+        }
 
-.sidebar-profile-img {
-    width: 40px;  /* Tamanho ideal para sua sidebar de 80px */
-    height: 40px;
-    border-radius: 50%; /* Deixa redonda */
-    object-fit: cover;  /* Garante que a foto não fique esticada */
-    border: 2px solid #3f3f46; /* Borda sutil para destacar */
-    transition: all 0.2s ease;
-}
+        /* Efeito ao passar o mouse: Borda Rosa */
+        .sidebar-nav a:hover .sidebar-profile-img {
+            border-color: #9D4EDD;
+            transform: scale(1.1);
+        }
 
-/* Efeito ao passar o mouse: Borda Rosa */
-.sidebar-nav a:hover .sidebar-profile-img {
-    border-color: #9D4EDD;
-    transform: scale(1.1);
-}
+        /* --- Toasts de Notificação (A Nata) --- */
+        .django-messages {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+        }
+        .message-toast {
+            padding: 15px 25px; margin-bottom: 10px; border-radius: 8px;
+            color: #fff; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s forwards, fadeOut 0.5s 5s forwards;
+            min-width: 300px;
+        }
+        .message-toast.success { background-color: #00C49F; border-left: 5px solid #009175; }
+        .message-toast.error { background-color: #E845A0; border-left: 5px solid #c22e82; }
+        .message-toast.warning { background-color: #FBBC05; border-left: 5px solid #d49e04; }
 
-/* --- Toasts de Notificação (A Nata) --- */
-.django-messages {
-    position: fixed; top: 20px; right: 20px; z-index: 9999;
-}
-.message-toast {
-    padding: 15px 25px; margin-bottom: 10px; border-radius: 8px;
-    color: #fff; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    animation: slideIn 0.5s forwards, fadeOut 0.5s 5s forwards;
-    min-width: 300px;
-}
-.message-toast.success { background-color: #00C49F; border-left: 5px solid #009175; }
-.message-toast.error { background-color: #E845A0; border-left: 5px solid #c22e82; }
-.message-toast.warning { background-color: #FBBC05; border-left: 5px solid #d49e04; }
-
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
 
     </style>
 </head>
@@ -192,50 +206,52 @@
 
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <span class="material-symbols-outlined">ads_click</span>
+            <a href="{% url 'dashboard_home' %}">
+                <img src="{% static 'img/logoside.png' %}" alt="Media Scope" class="logo-img">
+            </a>
         </div>
 
-        <nav class="sidebar-nav">
-            <a href="{% url 'dashboard_home' %}" 
-               class="{% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}" 
-               title="Dashboard">
-                <span class="material-symbols-outlined">monitoring</span>
-            </a>
-            
-            <a href="{% url 'planos' %}" 
-               class="{% if request.resolver_match.url_name == 'planos' %}active{% endif %}" 
-               title="Planos e Assinatura">
-                <span class="material-symbols-outlined">workspace_premium</span>
-            </a>
+       <nav class="sidebar-nav">
+    {% if request.user.is_superuser %}
+        <a href="{% url 'admin_dashboard' %}" 
+           class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" 
+           title="Admin Dashboard">
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+        </a>
 
-            {% if request.user.is_superuser %}
-    <a href="{% url 'admin_dashboard' %}" 
-       class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" 
-       title="Admin Dashboard">
-        <span class="material-symbols-outlined" style="color: var(--secondary);">admin_panel_settings</span>
-    </a>
-    {% endif %}
+        <a href="{% url 'admin_clients' %}" 
+           class="{% if request.resolver_match.url_name == 'admin_clients' %}active{% endif %}" 
+           title="Gerenciar Clientes">
+            <span class="material-symbols-outlined">groups</span>
+        </a>
 
-            <a href="{% url 'sentiment_analysis' %}" 
-   class="{% if request.resolver_match.url_name == 'sentiment_analysis' %}active{% endif %}" 
-   title="Análise de Sentimentos">
-    <span class="material-symbols-outlined">psychology</span> </a>
-    
-            <a href="{% url 'settings' %}" title="Minha Conta" 
-                class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
-    
-                {% if request.user.profile_picture %}
-                    <img src="{{ request.user.profile_picture.url }}" alt="Perfil" class="sidebar-profile-img">
-    
-                {% else %}
-                    <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:'User' }}+{{ request.user.last_name }}&background=random&color=fff&size=128" alt="Perfil" class="sidebar-profile-img">
-    
+        <a href="{% url 'dashboard_home' %}" title="Ver como Usuário">
+            <span class="material-symbols-outlined">visibility</span>
+        </a>
+
+    {% else %}
+        <a href="{% url 'dashboard_home' %}" class="{% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}" title="Dashboard">
+            <span class="material-symbols-outlined">monitoring</span>
+        </a>
+        
+        <a href="{% url 'planos' %}" class="{% if request.resolver_match.url_name == 'planos' %}active{% endif %}" title="Planos">
+            <span class="material-symbols-outlined">workspace_premium</span>
+        </a>
+
+        <a href="{% url 'sentiment_analysis' %}" class="{% if request.resolver_match.url_name == 'sentiment_analysis' %}active{% endif %}" title="Análise IA">
+            <span class="material-symbols-outlined">psychology</span>
+        </a>
+        
+        <a href="{% url 'settings' %}" class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}" title="Minha Conta">
+            {% if request.user.profile_picture %}
+                <img src="{{ request.user.profile_picture.url }}" alt="Perfil" class="sidebar-profile-img">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ request.user.first_name|default:'User' }}+{{ request.user.last_name }}&background=random&color=fff&size=128" alt="Perfil" class="sidebar-profile-img">
             {% endif %}
-            </a>
-            <a href="#" title="YouTube (Em breve)">
-                <span class="material-symbols-outlined">smart_display</span>
-            </a>
-        </nav>
+        </a>
+    {% endif %}
+</nav>
+
         <div class="sidebar-footer">
             <a href="{% url 'logout' %}" title="Sair">
                 <span class="material-symbols-outlined">logout</span>

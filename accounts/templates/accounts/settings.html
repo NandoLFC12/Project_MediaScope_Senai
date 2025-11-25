@@ -228,16 +228,34 @@ ul.errorlist {
 
     <div id="plan" class="tab-content">
         <div class="card-transparent">
-            <h3 style="color: #fff; margin-bottom: 10px;">Seu Plano</h3>
-            <div style="background: #18181b; padding: 20px; border-radius: 8px; border: 1px solid #3f3f46; display: flex; align-items: center; justify-content: space-between;">
+            <h3 style="color: #fff; margin-bottom: 10px;">Seu Plano Atual</h3>
+            
+            <div style="background: #18181b; padding: 25px; border-radius: 8px; border: 1px solid #3f3f46; display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                    <h4 style="color: #fff; margin: 0;">Plano Gratuito</h4>
-                    <p style="color: #a0a0a0; margin: 5px 0 0;">Você tem acesso limitado aos recursos.</p>
+                    <h4 style="color: #fff; margin: 0; font-size: 1.2rem;">
+                        {{ user.subscription.plan.name|default:"Plano Gratuito (Básico)" }}
+                    </h4>
+                    
+                    <p style="color: #a0a0a0; margin: 5px 0 0;">
+                        {% if user.subscription.plan.price_monthly > 0 %}
+                            Renova em: <strong style="color: #fff;">{{ user.subscription.current_period_end|date:"d/m/Y" }}</strong>
+                        {% else %}
+                            Você está usando a versão gratuita.
+                        {% endif %}
+                    </p>
                 </div>
-                <span style="background: #3f3f46; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem;">Ativo</span>
+                
+                <span style="background: rgba(0, 196, 159, 0.1); color: #00C49F; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+                    {{ user.subscription.get_status_display|default:"Ativo" }}
+                </span>
             </div>
+
             <br>
-            <a href="{% url 'planos' %}" class="btn-save" style="text-decoration: none; display: inline-block;">Fazer Upgrade</a>
+            
+            <h4 style="color: #fff; margin-bottom: 15px;">Mudar Assinatura</h4>
+            <a href="{% url 'planos' %}" class="btn-save" style="text-decoration: none; display: inline-block;">
+                Ver Outros Planos
+            </a>
         </div>
     </div>
 

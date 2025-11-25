@@ -1,0 +1,73 @@
+{% extends "analytics/base.html" %}
+{% block title %}Gerenciar Clientes - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .client-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .client-table th { text-align: left; padding: 15px; color: #a0a0a0; border-bottom: 1px solid #3f3f46; }
+    .client-table td { padding: 15px; border-bottom: 1px solid #3f3f46; color: #fff; }
+    .client-table tr:hover { background-color: #27272a; }
+    
+    .badge-plan { padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+    .plan-Free { background: #3f3f46; color: #fff; }
+    .plan-Pro { background: #9D4EDD; color: #fff; }
+    .plan-Enterprise { background: #E845A0; color: #fff; }
+</style>
+
+<div style="max-width: 1200px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="color: #fff;">Gerenciar Clientes</h1>
+        <a href="{% url 'admin_dashboard' %}" style="color: #a0a0a0; text-decoration: none;">&larr; Voltar ao Dashboard</a>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden; margin-top: 30px;">
+        <table class="client-table">
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>Email</th>
+                    <th>Data Cadastro</th>
+                    <th>Plano Atual</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #3f3f46; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                                    {{ user.first_name|first }}{{ user.last_name|first }}
+                                </div>
+                            {% endif %}
+                            {{ user.get_full_name|default:"Sem Nome" }}
+                        </div>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if user.subscription and user.subscription.plan %}
+                            <span class="badge-plan plan-{{ user.subscription.plan.name }}">
+                                {{ user.subscription.plan.name }}
+                            </span>
+                        {% else %}
+                            <span style="color: #a0a0a0;">Sem Plano</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_active %}
+                            <span style="color: #00C49F;">● Ativo</span>
+                        {% else %}
+                            <span style="color: #ef4444;">● Inativo</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

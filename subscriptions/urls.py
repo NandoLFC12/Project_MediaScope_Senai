@@ -1,8 +1,10 @@
-# Em subscriptions/urls.py (ARQUIVO NOVO)
+# Em subscriptions/urls.py
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    # A URL será: /subscriptions/subscribe/1/ (onde 1 é o ID do plano)
-    path('subscribe/<int:plan_id>/', views.subscribe_view, name='subscribe'),
+    path('planos/', views.planos_view, name='planos'),
+    
+    # Rota que processa o clique no botão
+    path('upgrade/<int:plan_id>/', views.upgrade_plan_view, name='upgrade_plan'),
 ]

@@ -13,10 +13,8 @@ MediaScope é uma plataforma para coletar, processar e visualizar métricas de c
 - [Instalação](#instalação)
 - [Configuração (API Keys e .env)](#configuração-api-keys-e-env)
 - [Como rodar](#como-rodar)
-- [Scripts úteis](#scripts-úteis)
 - [Como a YouTube Data API é utilizada](#como-a-youtube-data-api-é-utilizada)
 - [Banco de dados](#banco-de-dados)
-- [Testes](#testes)
 - [Melhorias futuras](#melhorias-futuras)
 - [Contribuição](#contribuição)
 - [Licença](#licença)
@@ -33,18 +31,17 @@ MediaScope é uma plataforma para coletar, processar e visualizar métricas de c
 ---
 
 ## Stack e Dependências
-- Python 3.10+
+- Python 3.11.8
 - google-api-python-client (YouTube Data API)
 - requests
-- pandas (provável)
-- Dependências listadas em `requirements.txt` (verificado no repositório).
+- pandas 
+- Dependências listadas em `requirements.txt`
 
 > Verifique `requirements.txt` para a lista completa de pacotes e versões.
 
 ---
 
-## Estrutura sugerida do repositório (detectado)
-A análise inicial identificou os seguintes arquivos/estruturas (amostra):
+## Estrutura sugerida do repositório 
 
 ```
 /mnt/data/Project_MediaScope_Senai-dash
@@ -53,13 +50,12 @@ A análise inicial identificou os seguintes arquivos/estruturas (amostra):
 Arquivos detectados: 64 (amostra incluída no rascunho de documentação entregue).
 
 Pastas e arquivos importantes:
-- `scripts/` — scripts de coleta e atualização (ex.: `collect_data.py`, `update_metrics.py`)
-- `app/` ou `src/` — código principal da aplicação (se existir)
+- `config/` — configurações do projeto
+- `accounts/`, `analytics/`, `core/`, `subscriptions/` - aplicativos
 - `requirements.txt` — dependências Python
 - `README.md` original (presente no repositório)
-- `.env.example` ou similar (se existir) — variáveis de ambiente exemplo
+- `.env` ou similar — variáveis de ambiente exemplo
 
-> Observação: se alguma das pastas acima não existir no seu repositório, adapte conforme a estrutura real.
 
 ---
 
@@ -67,8 +63,11 @@ Pastas e arquivos importantes:
 
 1. Clone o repositório:
 ```bash
-git clone /mnt/data/Project_MediaScope_Senai-dash.zip media_scope
-cd media_scope
+git clone https://github.com/Fabinhonhou/MediaScope.git
+cd MediaScope
+# caso esteja em outra branch, use o comando git checkout nome-da-branch
+# nesse caso, a branch está como dash
+git checkout dash
 ```
 
 2. Crie e ative um virtualenv (recomendado):
@@ -77,26 +76,36 @@ python -m venv .venv
 source .venv/bin/activate   # Linux / macOS
 .venv\Scripts\activate    # Windows (PowerShell)
 ```
+3. Crie o arquivo `.env`  (explicação de como obter a api key do youtube e a de Auth logo depois desse passo a passo )
+```bash
+SECRET_KEY = 'sua-secret-key-aqui'
 
-3. Instale dependências:
+YOUTUBE_API_KEY='sua-chave-api-aqui'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'sua-chave-api-de-autentição-aqui'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'sua-chave-secreta-de-autenticação-aqui'
+
+DB_NAME='MediaScope'
+DB_USER='postgres'
+DB_PASSWORD='sua-senha-aqui'
+DB_HOST='localhost'
+DB_PORT='5432'
+``` 
+
+4. Instale dependências:
 ```bash
 pip install -r requirements.txt
 ```
 
+5. Crie o banco de dados:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createcachetable
+```
+
 ---
-
-## Configuração (API Keys e .env)
-
-Crie um arquivo `.env` na raiz do projeto (ou copie `.env.example`) com as variáveis mínimas:
-
-```
-YOUTUBE_API_KEY=your_api_key_here
-DATABASE_URL=...
-# Outras variáveis possíveis:
-# DJANGO_SECRET_KEY (se aplicável)
-# FLASK_APP (se aplicável)
-# SMTP_* (se houver envio de e-mail)
-```
+## Configurações da API KEY do Youtube e do Google Auth
 
 Como obter a API Key do YouTube:
 1. Acesse o console do Google Cloud (https://console.cloud.google.com/).
@@ -105,30 +114,41 @@ Como obter a API Key do YouTube:
 4. Vá em "Credenciais" e crie uma API Key.
 5. Cole a chave em `YOUTUBE_API_KEY` no seu `.env`.
 
+Como obter a API Key e Secret do Google Auth:
+1. Acesse o console do Google Cloud (https://console.cloud.google.com/).
+2. Crie um novo projeto (ou use um existente).
+3. Habilite a API "Google Identity and Access Management".
+4. Vá em "Credenciais" e crie uma.
+5. Selecione em "Criar Credenciais" a opção "ID do cliente OAuth 2.0".
+6. Selecione "Aplicação Web"
+7. Não feche a aba das chaves, copie a Key e cole em `SOCIAL_AUTH_GOOGLE_OAUTH2_KEY`
+8. Copie o Secret Key e cole em `SOCIAL_AUTH_GOOGLE_OAUTH2_ SECRET`
+9. Feche a aba das chaves e reproduza os próximos passos.
+10. Adicione em "Origens JavaScript autorizadas" as seguintes URLS (separadas)
+1 http://127.0.0.1:8000
+2 http://localhost:8000
+11. Adicione em "URIs de redirecionamento autorizados" as seguintes URLS (separadas)
+1 http://127.0.0.1:8000/oauth/complete/google-oauth2/
+2 http://localhost:8000/oauth/complete/google-oauth2/
+3 http://127.0.0.1:8000/social/complete/google-oauth2/
+4 http://localhost:8000/social/complete/google-oauth2/
+5 http://localhost:8000/auth/complete/google-oauth2/
+6 http://127.0.0.1:8000/auth/complete/google-oauth2/
+7 http://127.0.0.1:8000/auth/complete/google-oauth2/flowName=GeneralOAuthFlow
+12. Clique em "Salvar" no final da página.
+
+
 ---
 
 ## Como rodar
 
-### Executar scripts de coleta manualmente
+No terminal, verifique se a venv(ambiente virtual) está ativa e verifique se você está na pasta do projeto.
+E então, rode o comando 
 ```bash
-python scripts/collect_data.py
+python manage.py runserver
 ```
+esse comando vai iniciar o servidor, que rodara na porta http://127.0.0.1:8000/
 
-### Rodar a aplicação (se houver FastAPI/Flask)
-Exemplos possíveis — adapte conforme o framework usado:
-
-**FastAPI**
-```bash
-uvicorn app.main:app --reload
-```
-
-**Flask**
-```bash
-export FLASK_APP=app
-flask run
-```
-
-Se a aplicação não expuser uma API, confira os scripts em `scripts/` para entender como os dados são coletados e onde são salvos.
 
 ---
 
@@ -158,20 +178,7 @@ A documentação do Google (YouTube Data API v3) é a referência para parâmetr
 ---
 
 ## Banco de dados
-A análise inicial não detectou com certeza qual banco foi usado. Possíveis opções:
-- MongoDB (pymongo / mongoengine)
-- PostgreSQL / MySQL (psycopg2 / SQLAlchemy)
-
-Se informar qual foi utilizado, posso gerar o diagrama de esquema (collections/tables e campos) automaticamente.
-
----
-
-## Testes
-- Testes unitários: `pytest` (se existirem testes).
-- Rodar testes:
-```bash
-pytest
-```
+PostgreSQL
 
 ---
 

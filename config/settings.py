@@ -198,6 +198,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.profile',    # Pega nome/foto
     'https://www.googleapis.com/auth/youtube.readonly',    # Vê dados públicos (vídeos, etc)
     'https://www.googleapis.com/auth/yt-analytics.readonly', # Vê dados PRIVADOS (impressões, etc)
+    'https://www.googleapis.com/auth/youtube.force-ssl', # Acesso mais forte (só pra garantir)
 ]
 
 # Pede um "refresh token". Isso é VITAL.
@@ -210,7 +211,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
 # JÁ TEMOS ISSO (garante que estamos pedindo o refresh_token):
 SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     'access_type': 'offline',
-    'prompt': 'consent',
+    'prompt': 'consent'
 }
 
 # --- A LINHA QUE FALTAVA ---

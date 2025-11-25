@@ -216,9 +216,11 @@
     </a>
     {% endif %}
 
-            <a href="#" title="Histórico (Em breve)">
-                <span class="material-symbols-outlined">history</span>
-            </a>
+            <a href="{% url 'sentiment_analysis' %}" 
+   class="{% if request.resolver_match.url_name == 'sentiment_analysis' %}active{% endif %}" 
+   title="Análise de Sentimentos">
+    <span class="material-symbols-outlined">psychology</span> </a>
+    
             <a href="{% url 'settings' %}" title="Minha Conta" 
                 class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
     

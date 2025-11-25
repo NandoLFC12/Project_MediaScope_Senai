@@ -32,7 +32,7 @@
     .insights-legend { display: flex; gap: 20px; }
     .insights-legend span { display: flex; align-items: center; gap: 8px; }
     .insights-legend .dot1 { width: 10px; height: 10px; background-color: var(--primary); border-radius: 50%; }
-    .insights-legend .dot2 { width: 10px; height: 10px; background-color: var(--secondary); border-radius: 50%; }
+    .insights-legend .dot2 { width: 10px; height: 10px; background-color: #BA3780; border-radius: 50%; }
     .region-chart-container {
         height: 120px;
         display: flex;
@@ -275,7 +275,7 @@ if (chartData && chartData.datasets) {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { grid: { color: '#444' }, ticks: { color: '#A0A0A0' } },
+                y: { beginAtZero: true, min: 0, grid: { color: '#444' }, ticks: { color: '#A0A0A0' } },
                 x: {
                     type: 'time',
                     time: { unit: 'day', displayFormats: { day: 'MMM dd' } },

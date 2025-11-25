@@ -8,7 +8,7 @@ class CustomUserManager(BaseUserManager):
     """
     Gerenciador para criar usuários via e-mail.
     """
-    def create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError(_('O e-mail deve ser definido'))
         email = self.normalize_email(email)

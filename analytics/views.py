@@ -7,6 +7,11 @@ from . import youtube_service
 import json
 import logging
 from django.core.cache import cache
+import re
+from textblob import TextBlob
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from deep_translator import GoogleTranslator
 
 logger = logging.getLogger(__name__)
 
@@ -131,10 +136,16 @@ def dashboard_view(request):
             idx_views = header_map.get('views')
             idx_likes = header_map.get('likes')
 
+            def safe_int(value):
+                try:
+                    return int(value)
+                except(TypeError, ValueError):
+                    return 0
+
             if all([idx_day is not None, idx_views is not None, idx_likes is not None]):
                 chart_labels = [row[idx_day] for row in analytics_rows]
-                chart_views = [row[idx_views] for row in analytics_rows]
-                chart_likes = [row[idx_likes] for row in analytics_rows]
+                chart_views = [safe_int(row[idx_views]) for row in analytics_rows]
+                chart_likes = [safe_int(row[idx_likes]) for row in analytics_rows]
                 
                 insights_data = {
                     'labels': chart_labels,
@@ -180,3 +191,94 @@ def dashboard_view(request):
         context['error_message'] = f"Um erro inesperado ao processar dados: {e}"
 
     return render(request, 'analytics/index.html', context)
+@login_required
+def sentiment_analysis_view(request):
+    context = {}
+    user_videos = [] 
+
+    # --- PASSO 1: BUSCAR VÍDEOS (Igual a antes) ---
+    try:
+        social = request.user.social_auth.get(provider='google-oauth2')
+        credentials = Credentials(token=social.extra_data['access_token'])
+        youtube = build('youtube', 'v3', credentials=credentials)
+
+        request_videos = youtube.search().list(
+            part="snippet", forMine=True, type="video", maxResults=10, order="date"
+        )
+        response_videos = request_videos.execute()
+
+        for item in response_videos['items']:
+            user_videos.append({
+                'id': item['id']['videoId'],
+                'title': item['snippet']['title']
+            })
+    except Exception as e:
+        context['error'] = "Não foi possível carregar seus vídeos."
+
+    # --- PASSO 2: ANÁLISE COM TRADUÇÃO ---
+    if request.method == 'POST':
+        video_id = request.POST.get('video_id')
+        
+        if video_id:
+            try:
+                response_comments = youtube.commentThreads().list(
+                    part="snippet", videoId=video_id, maxResults=50, textFormat="plainText"
+                ).execute()
+                
+                comments_data = []
+                positive = 0
+                negative = 0
+                neutral = 0
+                
+                # Inicializa o tradutor
+                translator = GoogleTranslator(source='auto', target='en')
+
+                for item in response_comments['items']:
+                    raw_text = item['snippet']['topLevelComment']['snippet']['textDisplay']
+                    author = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
+                    
+                    # --- A MÁGICA DA TRADUÇÃO ---
+                    try:
+                        # Traduz para Inglês para o TextBlob entender
+                        translated_text = translator.translate(raw_text)
+                    except:
+                        # Se falhar (internet, etc), usa o original mesmo
+                        translated_text = raw_text
+
+                    # Analisa o texto traduzido (mas mostra o original na tela)
+                    blob = TextBlob(translated_text)
+                    polarity = blob.sentiment.polarity
+                    
+                    # Ajustei os limiares para ser mais sensível
+                    if polarity > 0.1:
+                        sentiment = 'Positivo'
+                        css_class = 'badge-pos'
+                        positive += 1
+                    elif polarity < -0.1:
+                        sentiment = 'Negativo'
+                        css_class = 'badge-neg'
+                        negative += 1
+                    else:
+                        sentiment = 'Neutro'
+                        css_class = 'badge-neu'
+                        neutral += 1
+                        
+                    comments_data.append({
+                        'author': author,
+                        'text': raw_text, # Mostra o original em PT-BR
+                        'sentiment': sentiment,
+                        'css': css_class
+                    })
+                
+                context.update({
+                    'selected_video_id': video_id,
+                    'comments': comments_data,
+                    'stats': {'pos': positive, 'neg': negative, 'neu': neutral, 'total': positive + negative + neutral}
+                })
+                
+            except Exception as e:
+                print(f"ERRO: {e}")
+                context['error'] = "Erro ao analisar comentários."
+
+    context['user_videos'] = user_videos
+    return render(request, 'analytics/sentiment.html', context)
